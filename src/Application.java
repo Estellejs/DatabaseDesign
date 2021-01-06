@@ -5,9 +5,9 @@ import java.util.Scanner;
 public class Application {
 
     public static void main(String[] args){
-        Connection conn = JDBCTool.getMySQLConn();
-        System.out.println(conn);
-        JDBCTool.releaseDB(null,null,conn);
+//        Connection conn = JDBCTool.getMySQLConn();
+//        System.out.println(conn);
+//        JDBCTool.releaseDB(null,null,conn);
 
         Scanner scanner=new Scanner(System.in);
 
@@ -56,10 +56,10 @@ public class Application {
                     condition="where area="+area+"";
                     break;
                 case "1Y":
-                    condition="where normal_temperature_num=3 and normal_test_num=2 and area=1 and area="+area+"";
+                    condition="where normal_temperature_num=3 and normal_test_num=2 and level=1 and area="+area+"";
                     break;
                 case "1N":
-                    condition="where (normal_temperature_num !=3 or normal_test_num !=2) and area="+area+"";
+                    condition="where (normal_temperature_num !=3 or normal_test_num !=2 or level!=1) and area="+area+"";
                     break;
                 case "2Y":
                     condition="where level!=area and area="+area+"";
@@ -274,7 +274,7 @@ public class Application {
 
                                         update_tools.update_nurse(ward_nurse);
                                     }else {
-                                        System.out.println("没有符合条件的病房护士，无法增加");
+                                        System.out.println("没有符合条件的病房护士，无法删除");
                                     }
                                     break;
                                 default:
@@ -309,7 +309,7 @@ public class Application {
                         System.out.println("请输入病床ID：");
                         int bed_id=Integer.parseInt(scanner.next());
                         while (true){
-                            condition="where ID="+bed_id;
+                            condition="where ID="+bed_id+"' and area='"+chief_nurse.getArea()+"'";
                             beds= select_tools.getBed(condition);
                             if (beds.size()>0){
                                 condition="where ID="+beds.get(0).getPatient_ID();
@@ -317,7 +317,7 @@ public class Application {
                                 select_tools.print_patients(patients);
                                 break;
                             }else {
-                                System.out.println("此病床ID不存在，请重新输入：");
+                                System.out.println("此病床ID不存在或不在该区域，请重新输入：");
                                 bed_id=Integer.parseInt(scanner.next());
                             }
                         }
@@ -353,10 +353,10 @@ public class Application {
                     condition="";
                     break;
                 case "1Y":
-                    condition="where normal_temperature_num=3 and normal_test_num=2 and area=1 ";
+                    condition="where normal_temperature_num=3 and normal_test_num=2 and level=1 ";
                     break;
                 case "1N":
-                    condition="where (normal_temperature_num !=3 or normal_test_num !=2)";
+                    condition="where (normal_temperature_num !=3 or normal_test_num !=2 or level!=1)";
                     break;
                 case "2Y":
                     condition="where level!=area ";
