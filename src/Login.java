@@ -10,11 +10,10 @@ class Login {
         Connection connection = null;
         ResultSet rs = null;
         PreparedStatement ps=null;
-
+        int id=-1;
         try {
             String name ="";
             String right_password = "";
-            int id=-1;
 
             System.out.println("请输入用户名：");
             Scanner scanner = new Scanner(System.in);
@@ -40,7 +39,7 @@ class Login {
                 String password=scanner.next();
                 if(password.equals(right_password)){
                     System.out.println("登陆成功");
-                    return id;
+                    break;
                 }else {
                     System.out.println("密码错误，请重新输入：");
                 }
@@ -50,7 +49,7 @@ class Login {
             System.out.println(e.getMessage());
             System.out.println(e.toString());
         }
-
-        return -1;
+        JDBCTool.releaseDB(rs,ps,connection);
+        return id;
     }
 }

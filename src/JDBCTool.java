@@ -22,7 +22,6 @@ public class JDBCTool {
             String password = p.getProperty("password");
             Class.forName(p.getProperty("class"));   //加载数据库驱动
             conn = DriverManager.getConnection(url,user,password);
-            System.out.println("连接成功");
         }
         //捕获异常信息
         catch (ClassNotFoundException | SQLException | IOException e) {
@@ -54,7 +53,6 @@ public class JDBCTool {
                 e.printStackTrace();
             }
         }
-        System.out.println("释放成功");
     }
 
 }
