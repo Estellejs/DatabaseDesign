@@ -1,9 +1,3 @@
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Scanner;
-
 public class doctor {
     int id;
     int area;
@@ -41,7 +35,7 @@ public class doctor {
 
     public doctor(int id){
         this.id=id;
-        this.area=public_tools.getArea(id,"doctor");
+        this.area= select_tools.getArea(id,"doctor");
     }
 
 }

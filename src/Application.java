@@ -1,5 +1,4 @@
 import java.sql.Connection;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -119,13 +118,13 @@ public class Application {
                         String condition="";
                         int area=doctor.getArea();
                         condition=getFiltrate(area);
-                        patients=public_tools.get_patient_information(condition);
-                        public_tools.print_patients(patients);
+                        patients= select_tools.get_patient_information(condition);
+                        select_tools.print_patients(patients);
 
                         System.out.println("请输入病人ID：");
                         String patientID=scanner.next();
                         condition="where ID='"+patientID+"' and area='"+doctor.getArea()+"'";
-                        patients=public_tools.get_patient_information(condition);
+                        patients= select_tools.get_patient_information(condition);
                         doctor_change_patient_information(doctor,patients.get(0));
 
                         break;
@@ -138,12 +137,12 @@ public class Application {
                             switch (input){
                                 case "1":
                                     String SQL="select * from chief_nurse where area="+doctor.getArea();
-                                    chief_nurse chief_nurse=public_tools.getChief_nurse(SQL);
+                                    chief_nurse chief_nurse= select_tools.getChief_nurse(SQL);
                                     System.out.println("ID:"+chief_nurse.ID+"  姓名:"+chief_nurse.name);
                                     break;
                                 case "2":
                                     condition="where area="+doctor.getArea();
-                                    ArrayList<ward_nurse> ward_nurses=public_tools.get_ward_nurse(condition);
+                                    ArrayList<ward_nurse> ward_nurses= select_tools.get_ward_nurse(condition);
                                     for (int i=0;i<ward_nurses.size();i++){
                                         ward_nurse ward_nurse=ward_nurses.get(i);
                                         System.out.println("ID:"+ward_nurse.getID()+"  姓名："+ward_nurse.getName()+"  负责的病人数量："+ward_nurse.getActual_patient_num());
@@ -153,8 +152,8 @@ public class Application {
                                     System.out.println("请输入病房护士ID：");
                                     int ward_nurse_id=Integer.parseInt(scanner.next());
                                     condition="where nurse_ID="+ward_nurse_id;
-                                    patients=public_tools.get_patient_information(condition);
-                                    public_tools.print_patients(patients);
+                                    patients= select_tools.get_patient_information(condition);
+                                    select_tools.print_patients(patients);
                                     break;
                                 default:
                                     is_wrong=true;
@@ -186,7 +185,7 @@ public class Application {
         String table_name="chief_nurse";
         int chief_nurse_id=Login.login(table_name);
         String SQL="select * from chief_nurse where ID="+chief_nurse_id;
-        chief_nurse chief_nurse=public_tools.getChief_nurse(SQL);
+        chief_nurse chief_nurse= select_tools.getChief_nurse(SQL);
         while (true){
             System.out.println("以查看当前治疗区域的病人信息：patient；以查看当前治疗区域的病房护士信息：nurse；\n查看病床信息：bed；查看病床的病人信息：bed_patient；重新登陆：r；退出：q；");
             boolean is_operation_wrong=true;
@@ -200,8 +199,8 @@ public class Application {
                         String condition="";
                         int area=chief_nurse.getArea();
                         condition=getFiltrate(area);
-                        patients=public_tools.get_patient_information(condition);
-                        public_tools.print_patients(patients);
+                        patients= select_tools.get_patient_information(condition);
+                        select_tools.print_patients(patients);
 
                         break;
                     case "nurse":
@@ -213,7 +212,7 @@ public class Application {
                             switch (input){
                                 case "1":
                                     condition="where area="+chief_nurse.getArea();
-                                    ArrayList<ward_nurse> ward_nurses=public_tools.get_ward_nurse(condition);
+                                    ArrayList<ward_nurse> ward_nurses= select_tools.get_ward_nurse(condition);
                                     for (int i=0;i<ward_nurses.size();i++){
                                         ward_nurse ward_nurse=ward_nurses.get(i);
                                         System.out.println("ID:"+ward_nurse.getID()+"  姓名："+ward_nurse.getName()+"  负责的病人数量："+ward_nurse.getActual_patient_num());
@@ -223,8 +222,8 @@ public class Application {
                                     System.out.println("请输入病房护士ID：");
                                     int ward_nurse_id=Integer.parseInt(scanner.next());
                                     condition="where nurse_ID="+ward_nurse_id;
-                                    patients=public_tools.get_patient_information(condition);
-                                    public_tools.print_patients(patients);
+                                    patients= select_tools.get_patient_information(condition);
+                                    select_tools.print_patients(patients);
                                     break;
                                 case "3":
 
@@ -239,7 +238,7 @@ public class Application {
                         break;
                     case "bed":
                         condition="where area="+chief_nurse.getArea();
-                        ArrayList<bed> beds=public_tools.getBed(condition);
+                        ArrayList<bed> beds= select_tools.getBed(condition);
                         for (int i=0;i<beds.size();i++){
                             bed bed=beds.get(i);
                             String strArea="";
@@ -262,11 +261,11 @@ public class Application {
                         int bed_id=Integer.parseInt(scanner.next());
                         while (true){
                             condition="where ID="+bed_id;
-                            beds=public_tools.getBed(condition);
+                            beds= select_tools.getBed(condition);
                             if (beds.size()>0){
                                 condition="where ID="+beds.get(0).getPatient_ID();
-                                patients=public_tools.get_patient_information(condition);
-                                public_tools.print_patients(patients);
+                                patients= select_tools.get_patient_information(condition);
+                                select_tools.print_patients(patients);
                                 break;
                             }else {
                                 System.out.println("此病床ID不存在，请重新输入：");
@@ -291,7 +290,6 @@ public class Application {
             }
         }
     }
-
     public static String getEmergencyFiltrate(){
         System.out.println("查看所有病人：all；");
         System.out.println("筛选条件：是否满足出院条件（是：1Y；否：1N）；是否待转入其他治疗区域（是：2Y；否：2N）；病人生命状态（康复出院：31；在院治疗：32；病亡：33）；治疗区域（轻症：41；重症：42；危重症：43；隔离区：44）");
@@ -364,10 +362,35 @@ public class Application {
                         ArrayList<patient>patients=new ArrayList<>();
                         String condition="";
                         condition=getEmergencyFiltrate();
-                        patients=public_tools.get_patient_information(condition);
-                        public_tools.print_patients(patients);
+                        patients= select_tools.get_patient_information(condition);
+                        select_tools.print_patients(patients);
                         break;
                     case "register":
+                        System.out.println("请输入病人姓名：");
+                        String name=scanner.next();
+                        System.out.println("请输入病情等级：（轻症：1；重症：2；危重症：3）");
+                        String in=scanner.next();
+                        int level=-1;
+                        boolean isWrong=true;
+                        while (isWrong){
+                            isWrong=false;
+                            switch (in){
+                                case "1":
+                                    level=1;
+                                    break;
+                                case "2":
+                                    level=2;
+                                    break;
+                                case "3":
+                                    level=3;
+                                    break;
+                                default:
+                                    isWrong = true;
+                                    System.out.println("输入错误，请重新输入。");
+                                    in = scanner.next();
+                            }
+                        }
+                        update_tools.insert_patient(name,level);
                         break;
                     case "q":
                         System.exit(0);
@@ -387,8 +410,6 @@ public class Application {
         }
 
     }
-
-
     public static String getWarmFiltrate(int ward_nurse_id){
         String condition="";
         System.out.println("查看负责的所有病人：all；");
@@ -432,7 +453,6 @@ public class Application {
         }
         return condition;
     }
-
     public static void ward_nurse(){
         String table_name="ward_nurse";
         int ward_nurse_id=Login.login(table_name);
@@ -450,10 +470,50 @@ public class Application {
                     case "patient":
                         ArrayList<patient>patients=new ArrayList<>();
                         condition=getWarmFiltrate(ward_nurse_id);
-                        patients=public_tools.get_patient_information(condition);
-                        public_tools.print_patients(patients);
+                        patients= select_tools.get_patient_information(condition);
+                        select_tools.print_patients(patients);
                         break;
                     case "update":
+                        System.out.println("请输入病人ID：");
+                        int patient_id=Integer.parseInt(scanner.next());
+                        patient patient=new patient();
+                        while (true){
+                            condition="where ID="+patient_id;
+                            patients=select_tools.get_patient_information(condition);
+                            if (patients.size()>0){
+                                patient=patients.get(0);
+                                break;
+                            }else {
+                                System.out.println("此病人ID不存在，请重新输入");
+                                patient_id=Integer.parseInt(scanner.next());
+                            }
+                        }
+                        System.out.println("请输入病人今天的体温：(例如：37.3)");
+                        String temperature=scanner.next();
+                        ArrayList<String> patient_temperature=patient.getTemperature();
+                        while (true){
+                            if (temperature.length()==4){
+                                if (Character.isDigit(temperature.charAt(0))&&Character.isDigit(temperature.charAt(1))&&Character.isDigit(temperature.charAt(3))&&temperature.charAt(2)=='.'){
+                                    patient_temperature.add(temperature);
+                                    patient.setTemperature(patient_temperature);
+                                    break;
+                                }else {
+                                    System.out.println("输入错误，请重新输入。");
+                                    temperature = scanner.next();
+                                }
+                            }else {
+                                System.out.println("输入错误，请重新输入。");
+                                temperature = scanner.next();
+                            }
+                        }
+                        int normal_temperature_num=patient.getNormal_temperature_num();
+                        if (temperature.compareTo("37.3")<0){
+                            normal_temperature_num+=1;
+                        }else {
+                            normal_temperature_num=0;
+                        }
+                        patient.setNormal_temperature_num(normal_temperature_num);
+                        update_tools.update_temperature(patient);
                         break;
                     case "q":
                         System.exit(0);

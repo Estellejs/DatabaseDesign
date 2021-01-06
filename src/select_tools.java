@@ -5,7 +5,7 @@ import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.sql.*;
 
-public class public_tools {
+public class select_tools {
     public static int getArea(int id,String table_name) {
         Connection connection = null;
         ResultSet rs = null;
@@ -27,7 +27,6 @@ public class public_tools {
         JDBCTool.releaseDB(rs,ps,connection);
         return area;
     }
-
     public static ArrayList<patient> get_patient_information(String filtrate){
         String SQL="";
         SQL="select * from patient "+filtrate;
@@ -61,7 +60,6 @@ public class public_tools {
         JDBCTool.releaseDB(rs,ps,connection);
         return patient_list;
     }
-
     public static void print_patients(ArrayList<patient> patients){
         if (patients.size()==0){
             System.out.println("空");
@@ -119,7 +117,6 @@ public class public_tools {
             }
         }
     }
-
     public static ArrayList<test> getTest(int patientID){
         ArrayList<test> tests=new ArrayList<>();
         Connection connection = null;

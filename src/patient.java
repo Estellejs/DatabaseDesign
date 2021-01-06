@@ -115,5 +115,6 @@ public class patient {
         }
         this.temperature=temperature_list;
     }
+    public patient(){}
 
 }
