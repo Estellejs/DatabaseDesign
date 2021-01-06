@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class check_tools {
     public static ArrayList<patient> getPatientRecovery(int area){
         ArrayList<patient> patients=new ArrayList<>();
-        String condition="where normal_temperature_num>=3 and normal_test_num>=2 and state=0 and area="+area;
+        String condition="where normal_temperature_num>=3 and normal_test_num>=2 and level=1 and state=0 and area="+area;
         patients=select_tools.get_patient_information(condition);
         return patients;
     }
