@@ -32,7 +32,7 @@ public class JDBCTool {
     }
 
     //释放数据库资源
-    public static void releaseDB(ResultSet resultSet, Statement statement, Connection connection){
+    public static void releaseDB(ResultSet resultSet, PreparedStatement statement, Connection connection){
         if(resultSet != null){
             try{
                 resultSet.close();
