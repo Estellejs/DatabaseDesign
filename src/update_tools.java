@@ -16,23 +16,7 @@ public class update_tools {
         temperature=temperature.substring(0,temperature.length()-1);
         String SQL="update patient set temperature='"+temperature+"' , normal_temperature_num="+new_patient.getNormal_temperature_num()+" where ID="+new_patient.getID();
 
-        Connection connection = null;
-        ResultSet rs = null;
-        PreparedStatement ps=null;
-        try {
-            connection = JDBCTool.getMySQLConn();
-            ps = connection.prepareStatement(SQL);
-            int result = ps.executeUpdate();
-            if (result==1){
-                System.out.println("更新成功！");
-            }else {
-                System.out.println("更新失败！");
-            }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println(e.toString());
-        }
-        JDBCTool.releaseDB(rs,ps,connection);
+        update(SQL);
 
     }
 
@@ -94,4 +78,33 @@ public class update_tools {
 
 
     }
+
+    public static void update_nurse(ward_nurse ward_nurse){
+
+        String SQL="update ward_nurse set area='"+ward_nurse.getArea()+"' , max_patient_num="+ward_nurse.getMax_patient_num()+
+                ", actual_patient_num="+ward_nurse.getActual_patient_num()+" where ID="+ward_nurse.getID();
+        update(SQL);
+    }
+
+    public static void update(String SQL){
+        Connection connection = null;
+        ResultSet rs = null;
+        PreparedStatement ps=null;
+        try {
+            connection = JDBCTool.getMySQLConn();
+            ps = connection.prepareStatement(SQL);
+            int result = ps.executeUpdate();
+            if (result==1){
+                System.out.println("更新成功！");
+            }else {
+                System.out.println("更新失败！");
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            System.out.println(e.toString());
+        }
+        JDBCTool.releaseDB(rs,ps,connection);
+    }
+
+
 }

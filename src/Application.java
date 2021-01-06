@@ -204,7 +204,7 @@ public class Application {
 
                         break;
                     case "nurse":
-                        System.out.println("查看病房护士信息：1；查看病房护士负责的病人：2；增删病房护士：3");
+                        System.out.println("查看病房护士信息：1；查看病房护士负责的病人：2；增加病房护士：3；删除病房护士：4");
                         String input=scanner.next();
                         boolean is_wrong=true;
                         while (is_wrong){
@@ -226,7 +226,56 @@ public class Application {
                                     select_tools.print_patients(patients);
                                     break;
                                 case "3":
+                                    condition="where area=0";
+                                    ward_nurses=select_tools.get_ward_nurse(condition);
+                                    ward_nurse ward_nurse=new ward_nurse();
+                                    if (ward_nurses.size()>0) {
+                                        ward_nurse=chief_get_change_ward_nurse(condition,ward_nurses);
+                                        ward_nurse.setArea(chief_nurse.getArea());
+                                        switch (chief_nurse.getArea()){
+                                            case 1:
+                                                ward_nurse.setMax_patient_num(3);
+                                                break;
+                                            case 2:
+                                                ward_nurse.setMax_patient_num(2);
+                                                break;
+                                            case 3:
+                                                ward_nurse.setMax_patient_num(1);
+                                                break;
+                                        }
+                                        update_tools.update_nurse(ward_nurse);
+                                    }else {
+                                        System.out.println("没有符合条件的病房护士，无法增加");
+                                    }
+                                    break;
+                                case "4":
+                                    condition="where area="+chief_nurse.getArea();
+                                    ward_nurses=select_tools.get_ward_nurse(condition);
+                                    ward_nurse=new ward_nurse();
+                                    if (ward_nurses.size()>0) {
+                                        ward_nurse=chief_get_change_ward_nurse(condition,ward_nurses);
+                                        ward_nurse.setArea(0);
+                                        ward_nurse.setActual_patient_num(0);
+                                        ward_nurse.setMax_patient_num(0);
+                                        ArrayList<bed> beds=new ArrayList<>();
+                                        condition="where nurse_ID="+ward_nurse.getID();
+                                        patients=select_tools.get_patient_information(condition);
 
+                                        for (int i=0;i<patients.size();i++){
+                                            String SQL_patients="update patient set area=4,bed_ID=0,nurse_ID=0 where ID="+patients.get(i).getID();
+                                            condition="where patient_ID="+patients.get(i).getID();
+                                            ArrayList<bed> beds1=select_tools.getBed(condition);
+                                            if (beds1.size()>0){
+                                                String SQL_beds="update bed set patient_ID=0 where ID="+beds1.get(0).getID();
+                                                update_tools.update(SQL_beds);
+                                            }
+                                            update_tools.update(SQL_patients);
+                                        }
+
+                                        update_tools.update_nurse(ward_nurse);
+                                    }else {
+                                        System.out.println("没有符合条件的病房护士，无法增加");
+                                    }
                                     break;
                                 default:
                                     is_wrong=true;
@@ -531,6 +580,33 @@ public class Application {
                 break;
             }
         }
+    }
+    public static ward_nurse chief_get_change_ward_nurse(String condition,ArrayList<ward_nurse> ward_nurses){
+        Scanner scanner=new Scanner(System.in);
+        ward_nurse ward_nurse=new ward_nurse();
+        for (int i = 0; i < ward_nurses.size(); i++) {
+            ward_nurse = ward_nurses.get(i);
+            System.out.println("ID:" + ward_nurse.getID() + "  姓名：" + ward_nurse.getName());
+        }
+
+        System.out.println("请输入病房护士ID：");
+        int nurse_id = Integer.parseInt(scanner.next());
+        boolean is_id_wrong=true;
+        while (is_id_wrong) {
+            for (int i = 0; i < ward_nurses.size(); i++) {
+                if (nurse_id==ward_nurses.get(i).getID()){
+                    ward_nurse=ward_nurses.get(i);
+                    is_id_wrong=false;
+                    break;
+                }
+            }
+            if (is_id_wrong){
+                System.out.println("输入错误，请重新输入。");
+                nurse_id = Integer.parseInt(scanner.next());
+            }
+
+        }
+        return ward_nurse;
     }
 
 
