@@ -106,7 +106,7 @@ public class Application {
         int doctorID= Login.login(table_name);
         doctor doctor=new doctor(doctorID);
         while (true){
-            System.out.println("以查看当前治疗区域的病人信息：patient；以查看当前治疗区域的护士长及病房护士信息：nurse；重新登陆：r；退出：q；");
+            System.out.println("以查看当前治疗区域的病人信息：patient；以查看当前治疗区域的护士长及病房护士信息：nurse；决定病人是否出院：leave；重新登陆：r；退出：q；");
             boolean is_operation_wrong=true;
             String operation="";
             operation = scanner.next();
@@ -162,6 +162,43 @@ public class Application {
                                     break;
                             }
                         }
+                        break;
+                    case "leave":
+                        patients=check_tools.getPatientRecovery(doctor.getArea());
+                        select_tools.print_patients(patients);
+                        System.out.println("请输入病人ID：");
+                        int patient_id=Integer.parseInt(scanner.next());
+                        patient patient=new patient();
+                        boolean is_patient_id_wrong=true;
+                        while (is_patient_id_wrong){
+                            for (int i=0;i<patients.size();i++){
+                                if (patient_id==patients.get(i).getID()){
+                                    is_patient_id_wrong=false;
+                                    patient=patients.get(i);
+                                    break;
+                                }
+                            }
+                            if (is_patient_id_wrong){
+                                System.out.println("输入错误，请重新输入。");
+                                patient_id = Integer.parseInt(scanner.next());
+                            }
+                        }
+                        String SQL="update patient set state=1,bed_ID=0,nurse_ID=0 where ID="+patient.getID();
+
+                        condition="where ID="+patient.getNurse_ID();
+                        ArrayList<ward_nurse> ward_nurses=select_tools.get_ward_nurse(condition);
+                        if (ward_nurses.size()>0) {
+                            String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(0).getActual_patient_num() - 1) + " where ID=" + ward_nurses.get(0).getID();
+                            update_tools.update(SQL_nurse);
+                        }
+                        condition="where ID="+patient.getBed_ID();
+                        ArrayList<bed> beds=select_tools.getBed(condition);
+                        if (beds.size()>0){
+                            String SQL_bed= "update bed set patient_ID = 0 where ID=" + beds.get(0).getID();
+                            update_tools.update(SQL_bed);
+                        }
+                        update_tools.update(SQL);
+
                         break;
                     case "q":
                         System.exit(0);
