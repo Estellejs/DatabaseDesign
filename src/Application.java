@@ -98,35 +98,14 @@ public class Application {
                 case "11":
                     sql="update patient set level=1 where ID="+patient.getID();
                     update_tools.update(sql);
-                    patient.setLevel(1);
-                    if(check_tools.checkIfRecovery(patient))
-                        System.out.println("病人已满足出院条件");
-                    if(check_tools.is_area_has_space_nurse(1)){
-                        update_tools.change_area(patient,1);
-                        System.out.println("病人已成功转区域");
-                    }else {
-                        System.out.println("没有空闲，转区域失败");
-                    }
                     break;
                 case "12":
                     sql="update patient set level=2 where ID="+patient.getID();
                     update_tools.update(sql);
-                    if(check_tools.is_area_has_space_nurse(2)){
-                        update_tools.change_area(patient,2);
-                        System.out.println("病人已成功转区域");
-                    }else {
-                        System.out.println("没有空闲，转区域失败");
-                    }
                     break;
                 case "13":
                     sql="update patient set level=3 where ID="+patient.getID();
                     update_tools.update(sql);
-                    if(check_tools.is_area_has_space_nurse(3)){
-                        update_tools.change_area(patient,3);
-                        System.out.println("病人已成功转区域");
-                    }else {
-                        System.out.println("没有空闲，转区域失败");
-                    }
                     break;
 //                case "21":
 //                    sql="update patient set state=1 where ID="+patient.getID();
@@ -142,8 +121,6 @@ public class Application {
                     break;
                 case "3":
                     update_tools.insert_test(patient);
-                    if(check_tools.checkIfRecovery(patient))
-                        System.out.println("病人已满足出院条件");
                     break;
                 default:
                     is_input_wrong = true;
@@ -358,6 +335,7 @@ public class Application {
                                                 break;
                                         }
                                         update_tools.update_nurse(ward_nurse);
+                                        check_tools.change_area(chief_nurse.getArea());
                                     }else {
                                         System.out.println("没有符合条件的病房护士，无法增加");
                                     }
@@ -374,19 +352,31 @@ public class Application {
                                         ArrayList<bed> beds=new ArrayList<>();
                                         condition="where nurse_ID="+ward_nurse.getID();
                                         patients=select_tools.get_patient_information(condition);
+                                        update_tools.update_nurse(ward_nurse);
 
                                         for (int i=0;i<patients.size();i++){
-                                            String SQL_patients="update patient set area=4,bed_ID=0,nurse_ID=0 where ID="+patients.get(i).getID();
-                                            condition="where patient_ID="+patients.get(i).getID();
-                                            ArrayList<bed> beds1=select_tools.getBed(condition);
-                                            if (beds1.size()>0){
-                                                String SQL_beds="update bed set patient_ID=0 where ID="+beds1.get(0).getID();
-                                                update_tools.update(SQL_beds);
+
+                                            String nurse_condition="where max_patient_num > actual_patient_num and area="+chief_nurse.getArea();
+                                            ArrayList<ward_nurse> ward_nursesl=select_tools.get_ward_nurse(nurse_condition);
+                                            if (ward_nursesl.size()>0){
+                                                String SQL_patients = "update patient set nurse_ID="+ward_nursesl.get(0).getID()+" where ID=" + patients.get(i).getID();
+                                                update_tools.update(SQL_patients);
+                                                String SQL_nurse="update ward_nurse set actual_patient_num="+(ward_nursesl.get(0).getActual_patient_num()+1)+" where ID=" + ward_nursesl.get(0).getID();
+                                                update_tools.update(SQL_nurse);
+                                            }else {
+                                                String SQL_patients = "update patient set area=4,bed_ID=0,nurse_ID=0 where ID=" + patients.get(i).getID();
+                                                condition = "where patient_ID=" + patients.get(i).getID();
+                                                ArrayList<bed> beds1 = select_tools.getBed(condition);
+                                                if (beds1.size() > 0) {
+                                                    String SQL_beds = "update bed set patient_ID=0 where ID=" + beds1.get(0).getID();
+                                                    update_tools.update(SQL_beds);
+                                                }
+                                                update_tools.update(SQL_patients);
+                                                check_tools.change_area(chief_nurse.getArea());
                                             }
-                                            update_tools.update(SQL_patients);
                                         }
 
-                                        update_tools.update_nurse(ward_nurse);
+
                                     }else {
                                         System.out.println("没有符合条件的病房护士，无法删除");
                                     }
