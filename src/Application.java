@@ -101,14 +101,32 @@ public class Application {
                     patient.setLevel(1);
                     if(check_tools.checkIfRecovery(patient))
                         System.out.println("病人已满足出院条件");
+                    if(check_tools.is_area_has_space_nurse(1)){
+                        update_tools.change_area(patient,1);
+                        System.out.println("病人已成功转区域");
+                    }else {
+                        System.out.println("没有空闲，转区域失败");
+                    }
                     break;
                 case "12":
                     sql="update patient set level=2 where ID="+patient.getID();
                     update_tools.update(sql);
+                    if(check_tools.is_area_has_space_nurse(2)){
+                        update_tools.change_area(patient,2);
+                        System.out.println("病人已成功转区域");
+                    }else {
+                        System.out.println("没有空闲，转区域失败");
+                    }
                     break;
                 case "13":
                     sql="update patient set level=3 where ID="+patient.getID();
                     update_tools.update(sql);
+                    if(check_tools.is_area_has_space_nurse(3)){
+                        update_tools.change_area(patient,3);
+                        System.out.println("病人已成功转区域");
+                    }else {
+                        System.out.println("没有空闲，转区域失败");
+                    }
                     break;
 //                case "21":
 //                    sql="update patient set state=1 where ID="+patient.getID();

@@ -84,6 +84,12 @@ public class update_tools {
         update(SQL);
     }
 
+    public static void update_bed(bed bed){
+        String SQL="update bed set area='"+bed.getArea()+"' , ward="+bed.getWard()+
+                ", bed_index="+bed.getBed_index()+", patient_ID="+bed.getPatient_ID()+" where ID="+bed.getID();
+        update(SQL);
+    }
+
     public static void update(String SQL){
         Connection connection = null;
         ResultSet rs = null;
@@ -167,5 +173,36 @@ public class update_tools {
                     break;
             }
         }
+    }
+
+    public static void change_area(patient patient,int newArea){
+        //原先床位patient_ID置0
+        int old_bed_id = patient.getBed_ID();
+        String condition = "where ID="+old_bed_id;
+        ArrayList<bed> old_bed = select_tools.getBed(condition);
+        old_bed.get(0).setPatient_ID(0);
+        update_bed(old_bed.get(0));
+        //原先的护士actual_patient_num减1
+        int old_nurse_id = patient.getNurse_ID();
+        condition = "where ID="+old_nurse_id;
+        ArrayList<ward_nurse> old_nurse = select_tools.get_ward_nurse(condition);
+        old_nurse.get(0).setActual_patient_num(old_nurse.get(0).getActual_patient_num()-1);
+        update_nurse(old_nurse.get(0));
+        //分配新的床位
+        condition = "where area="+newArea+" and patient_ID=0";
+        ArrayList<bed> new_beds = select_tools.getBed(condition);
+        patient.setBed_ID(new_beds.get(0).getID());
+        new_beds.get(0).setPatient_ID(patient.getID());
+        String sql = "update patient set bed_ID="+new_beds.get(0).getID()+" where ID="+patient.getID();
+        update(sql);
+        update_bed(new_beds.get(0));
+        //分配新的护士
+        condition="where max_patient_num > actual_patient_num and area="+newArea;
+        ArrayList<ward_nurse> new_nurses = select_tools.get_ward_nurse(condition);
+        patient.setNurse_ID(new_nurses.get(0).getID());
+        new_nurses.get(0).setActual_patient_num(new_nurses.get(0).getActual_patient_num()+1);
+        sql = "update patient set nurse_ID="+new_nurses.get(0).getID()+" where ID="+patient.getID();
+        update(sql);
+        update_nurse(new_nurses.get(0));
     }
 }
