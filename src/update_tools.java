@@ -1,10 +1,7 @@
-import org.sqlite.JDBC;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Random;
 
 public class update_tools {
 
@@ -104,6 +101,36 @@ public class update_tools {
             System.out.println(e.toString());
         }
         JDBCTool.releaseDB(rs,ps,connection);
+    }
+
+    public static void insert_test(patient patient){
+        Connection connection = null;
+        PreparedStatement ps=null;
+        //随机生成核酸检测结果
+        Random rand = new Random();
+        int randnum = rand.nextInt(2);
+        String result = "";
+        if(randnum==0)
+            result = "阳性";
+        else if(randnum==1)
+            result = "阴性";
+        Date date = new Date();
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+        String sql = "insert into test(patient_ID,result,date,current_level) values(?,?,?,?)";
+        try {
+            connection = JDBCTool.getMySQLConn();
+            ps=connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1,patient.getID());
+            ps.setString(2,result);
+            ps.setDate(3,sqlDate);
+            ps.setInt(4,patient.getLevel());
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            JDBCTool.releaseDB(null,ps,connection);
+        }
     }
 
 

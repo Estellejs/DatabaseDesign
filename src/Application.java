@@ -1,5 +1,6 @@
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Application {
@@ -86,16 +87,45 @@ public class Application {
         return condition;
     }
     public static void doctor_change_patient_information(doctor doctor,patient patient){
-        System.out.println("修改病情评级（轻症11；重症12；危重症13）；修改生命状态（康复出院：21；在院治疗：22；病亡：23）；核酸检测；3");
+        System.out.println("修改病情评级（轻症11；重症12；危重症13）；修改生命状态（在院治疗：22；病亡：23）；进行核酸检测；3");
         boolean is_input_wrong=true;
         Scanner scanner=new Scanner(System.in);
-        String condition="";
+        String sql ="";
         String input=scanner.next();
         while (is_input_wrong){
             is_input_wrong=false;
             switch (input){
                 case "11":
-                    condition="set level=1 where ID=";
+                    sql="update patient set level=1 where ID="+patient.getID();
+                    update_tools.update(sql);
+                    break;
+                case "12":
+                    sql="update patient set level=2 where ID="+patient.getID();
+                    update_tools.update(sql);
+                    break;
+                case "13":
+                    sql="update patient set level=3 where ID="+patient.getID();
+                    update_tools.update(sql);
+                    break;
+//                case "21":
+//                    sql="update patient set state=1 where ID="+patient.getID();
+//                    update_tools.update(sql);
+//                    break;
+                case "22":
+                    sql="update patient set state=0 where ID="+patient.getID();
+                    update_tools.update(sql);
+                    break;
+                case "23":
+                    sql="update patient set state=-1 where ID="+patient.getID();
+                    update_tools.update(sql);
+                    break;
+                case "3":
+                    update_tools.insert_test(patient);
+                    break;
+                default:
+                    is_input_wrong = true;
+                    System.out.println("输入错误，请重新输入。");
+                    input = scanner.next();
                     break;
             }
         }
@@ -121,12 +151,33 @@ public class Application {
                         patients= select_tools.get_patient_information(condition);
                         select_tools.print_patients(patients);
 
-                        System.out.println("请输入病人ID：");
-                        String patientID=scanner.next();
-                        condition="where ID='"+patientID+"' and area='"+doctor.getArea()+"'";
-                        patients= select_tools.get_patient_information(condition);
-                        doctor_change_patient_information(doctor,patients.get(0));
-
+                        boolean is_change = true;
+                        while(is_change){
+                            System.out.println("是否修改病人信息或进行核酸检测（是：Y，否：N）");
+                            is_change = false;
+                            operation = scanner.next();
+                            switch (operation){
+                                case "Y":
+                                    System.out.println("请输入病人ID：");
+                                    while (true) {
+                                        String patientID = scanner.next();
+                                        condition = "where ID='" + patientID + "' and area='" + doctor.getArea() + "'";
+                                        patients = select_tools.get_patient_information(condition);
+                                        if (patients.size() > 0){
+                                            doctor_change_patient_information(doctor, patients.get(0));
+                                            break;
+                                        }
+                                        else {
+                                            System.out.println("输入错误，请重新输入。");
+                                        }
+                                    }
+                                case "N":
+                                    break;
+                                default:
+                                    is_change = true;
+                                    System.out.println("输入错误，请重新输入。");
+                            }
+                        }
                         break;
                     case "nurse":
                         System.out.println("查看护士长信息：1；查看病房护士信息：2；查看病房护士负责的病人：3");
