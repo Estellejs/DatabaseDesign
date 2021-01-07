@@ -91,6 +91,7 @@ public class Application {
         boolean is_input_wrong=true;
         Scanner scanner=new Scanner(System.in);
         String sql ="";
+        String condition = "";
         String input=scanner.next();
         while (is_input_wrong){
             is_input_wrong=false;
@@ -126,7 +127,7 @@ public class Application {
                         update_tools.change_area(patient,3);
                         System.out.println("病人已成功转区域");
                     }else {
-                        System.out.println("没有空闲，专区域失败");
+                        System.out.println("没有空闲，转区域失败");
                     }
                     break;
 //                case "21":
@@ -140,10 +141,22 @@ public class Application {
                 case "23":
                     sql="update patient set state=-1 where ID="+patient.getID();
                     update_tools.update(sql);
+                    //原先床位patient_ID置0
+                    int old_bed_id = patient.getBed_ID();
+                    condition = "where ID="+old_bed_id;
+                    ArrayList<bed> old_bed = select_tools.getBed(condition);
+                    old_bed.get(0).setPatient_ID(0);
+                    update_tools.update_bed(old_bed.get(0));
+                    //原先的护士actual_patient_num减1
+                    int old_nurse_id = patient.getNurse_ID();
+                    condition = "where ID="+old_nurse_id;
+                    ArrayList<ward_nurse> old_nurse = select_tools.get_ward_nurse(condition);
+                    old_nurse.get(0).setActual_patient_num(old_nurse.get(0).getActual_patient_num()-1);
+                    update_tools.update_nurse(old_nurse.get(0));
                     break;
                 case "3":
                     update_tools.insert_test(patient);
-                    String condition="where ID="+patient.getID();
+                    condition="where ID="+patient.getID();
                     patient=select_tools.get_patient_information(condition).get(0);
                     if (check_tools.checkIfRecovery(patient))
                         System.out.println("病人已满足出院条件");
