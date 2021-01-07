@@ -153,6 +153,7 @@ public class Application {
                     ArrayList<ward_nurse> old_nurse = select_tools.get_ward_nurse(condition);
                     old_nurse.get(0).setActual_patient_num(old_nurse.get(0).getActual_patient_num()-1);
                     update_tools.update_nurse(old_nurse.get(0));
+                    check_tools.change_area(patient.getArea());
                     break;
                 case "3":
                     update_tools.insert_test(patient);
