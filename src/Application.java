@@ -249,6 +249,7 @@ public class Application {
                             update_tools.update(SQL_bed);
                         }
                         update_tools.update(SQL);
+                        check_tools.change_area(patient.getArea());
 
                         break;
                     case "change":
