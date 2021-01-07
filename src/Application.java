@@ -245,8 +245,17 @@ public class Application {
                                     }
                                     break;
                                 case "3":
-                                    System.out.println("请输入病房护士ID：");
-                                    int ward_nurse_id=Integer.parseInt(scanner.next());
+                                    boolean if_input_true = true;
+                                    int ward_nurse_id = 0;
+                                    while (if_input_true) {
+                                        try {
+                                            System.out.println("请输入病房护士ID：");
+                                            ward_nurse_id = Integer.parseInt(scanner.next());
+                                            if_input_true = false;
+                                        } catch (NumberFormatException e) {
+                                            System.out.println("输入错误，请重新输入");
+                                        }
+                                    }
                                     condition="where nurse_ID="+ward_nurse_id;
                                     patients= select_tools.get_patient_information(condition);
                                     select_tools.print_patients(patients);
@@ -262,21 +271,24 @@ public class Application {
                     case "leave":
                         patients=check_tools.getPatientRecovery(doctor.getArea());
                         select_tools.print_patients(patients);
-                        System.out.println("请输入病人ID：");
-                        int patient_id=Integer.parseInt(scanner.next());
                         patient patient=new patient();
                         boolean is_patient_id_wrong=true;
-                        while (is_patient_id_wrong){
-                            for (int i=0;i<patients.size();i++){
-                                if (patient_id==patients.get(i).getID()){
-                                    is_patient_id_wrong=false;
-                                    patient=patients.get(i);
-                                    break;
+                        while (is_patient_id_wrong) {
+                            try {
+                                System.out.println("请输入病人ID：");
+                                int patient_id = Integer.parseInt(scanner.next());
+                                for (int i = 0; i < patients.size(); i++) {
+                                    if (patient_id == patients.get(i).getID()) {
+                                        is_patient_id_wrong = false;
+                                        patient = patients.get(i);
+                                        break;
+                                    }
                                 }
-                            }
-                            if (is_patient_id_wrong){
+                                if (is_patient_id_wrong) {
+                                    System.out.println("输入错误，请重新输入。");
+                                }
+                            } catch (NumberFormatException e) {
                                 System.out.println("输入错误，请重新输入。");
-                                patient_id = Integer.parseInt(scanner.next());
                             }
                         }
                         String SQL="update patient set state=1,bed_ID=0,nurse_ID=0 where ID="+patient.getID();
@@ -356,8 +368,17 @@ public class Application {
                                     }
                                     break;
                                 case "2":
-                                    System.out.println("请输入病房护士ID：");
-                                    int ward_nurse_id=Integer.parseInt(scanner.next());
+                                    boolean is_input_true = true;
+                                    int ward_nurse_id = 0;
+                                    while (is_input_true) {
+                                        try {
+                                            System.out.println("请输入病房护士ID：");
+                                            ward_nurse_id = Integer.parseInt(scanner.next());
+                                            is_input_true = false;
+                                        } catch (NumberFormatException e) {
+                                            System.out.println("输入错误，请重新输入。");
+                                        }
+                                    }
                                     condition="where nurse_ID="+ward_nurse_id;
                                     patients= select_tools.get_patient_information(condition);
                                     select_tools.print_patients(patients);
@@ -457,18 +478,22 @@ public class Application {
                         break;
                     case "bed_patient":
                         System.out.println("请输入病床ID：");
-                        int bed_id=Integer.parseInt(scanner.next());
+
                         while (true){
-                            condition="where ID="+bed_id+"' and area='"+chief_nurse.getArea()+"'";
-                            beds= select_tools.getBed(condition);
-                            if (beds.size()>0){
-                                condition="where ID="+beds.get(0).getPatient_ID();
-                                patients= select_tools.get_patient_information(condition);
-                                select_tools.print_patients(patients);
-                                break;
-                            }else {
-                                System.out.println("此病床ID不存在或不在该区域，请重新输入：");
-                                bed_id=Integer.parseInt(scanner.next());
+                            try {
+                                int bed_id = Integer.parseInt(scanner.next());
+                                condition = "where ID=" + bed_id + "' and area='" + chief_nurse.getArea() + "'";
+                                beds = select_tools.getBed(condition);
+                                if (beds.size() > 0) {
+                                    condition = "where ID=" + beds.get(0).getPatient_ID();
+                                    patients = select_tools.get_patient_information(condition);
+                                    select_tools.print_patients(patients);
+                                    break;
+                                } else {
+                                    System.out.println("此病床ID不存在或不在该区域，请重新输入：");
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println("输入错误，请重新输入");
                             }
                         }
                         break;
@@ -680,17 +705,20 @@ public class Application {
                         break;
                     case "update":
                         System.out.println("请输入病人ID：");
-                        int patient_id=Integer.parseInt(scanner.next());
                         patient patient=new patient();
                         while (true){
-                            condition="where ID="+patient_id;
-                            patients=select_tools.get_patient_information(condition);
-                            if (patients.size()>0){
-                                patient=patients.get(0);
-                                break;
-                            }else {
-                                System.out.println("此病人ID不存在，请重新输入");
-                                patient_id=Integer.parseInt(scanner.next());
+                            try {
+                                int patient_id = Integer.parseInt(scanner.next());
+                                condition = "where ID=" + patient_id + " and nurse_ID=" + ward_nurse_id;
+                                patients = select_tools.get_patient_information(condition);
+                                if (patients.size() > 0) {
+                                    patient = patients.get(0);
+                                    break;
+                                } else {
+                                    System.out.println("ID不存在或不是您的病人，请重新输入");
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println("输入错误，请重新输入");
                             }
                         }
                         System.out.println("请输入病人今天的体温：(例如：37.3)");
@@ -748,20 +776,23 @@ public class Application {
             System.out.println("ID:" + ward_nurse.getID() + "  姓名：" + ward_nurse.getName());
         }
 
-        System.out.println("请输入病房护士ID：");
-        int nurse_id = Integer.parseInt(scanner.next());
         boolean is_id_wrong=true;
         while (is_id_wrong) {
-            for (int i = 0; i < ward_nurses.size(); i++) {
-                if (nurse_id==ward_nurses.get(i).getID()){
-                    ward_nurse=ward_nurses.get(i);
-                    is_id_wrong=false;
-                    break;
+            try {
+                System.out.println("请输入病房护士ID：");
+                int nurse_id = Integer.parseInt(scanner.next());
+                for (int i = 0; i < ward_nurses.size(); i++) {
+                    if (nurse_id == ward_nurses.get(i).getID()) {
+                        ward_nurse = ward_nurses.get(i);
+                        is_id_wrong = false;
+                        break;
+                    }
                 }
+            } catch (NumberFormatException e) {
+                System.out.println("输入错误，请重新输入。");
             }
             if (is_id_wrong){
                 System.out.println("输入错误，请重新输入。");
-                nurse_id = Integer.parseInt(scanner.next());
             }
 
         }
