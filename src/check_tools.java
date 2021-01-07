@@ -20,5 +20,11 @@ public class check_tools {
         }
     }
 
+    public static boolean checkIfRecovery(patient patient){
+        if(patient.getNormal_temperature_num()>=3 && patient.getNormal_test_num()>=2 && patient.level==1)
+            return true;
+        else
+            return false;
+    }
 
 }

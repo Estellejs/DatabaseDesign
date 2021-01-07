@@ -115,11 +115,13 @@ public class update_tools {
             result = "阳性";
             String tempSQL = "update patient set normal_test_num=0 where ID="+patient.getID();
             update(tempSQL);
+            patient.setNormal_test_num(0);
         }
         else if(randnum==1){
             result = "阴性";
             String tempSQL = "update patient set normal_test_num="+ (patient.getNormal_test_num()+1) +" where ID="+patient.getID();
             update(tempSQL);
+            patient.setNormal_test_num(patient.getNormal_test_num()+1);
         }
         Date date = new Date();
         java.sql.Date sqlDate = new java.sql.Date(date.getTime());

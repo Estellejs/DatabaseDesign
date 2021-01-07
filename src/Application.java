@@ -98,6 +98,9 @@ public class Application {
                 case "11":
                     sql="update patient set level=1 where ID="+patient.getID();
                     update_tools.update(sql);
+                    patient.setLevel(1);
+                    if(check_tools.checkIfRecovery(patient))
+                        System.out.println("病人已满足出院条件");
                     break;
                 case "12":
                     sql="update patient set level=2 where ID="+patient.getID();
@@ -121,6 +124,8 @@ public class Application {
                     break;
                 case "3":
                     update_tools.insert_test(patient);
+                    if(check_tools.checkIfRecovery(patient))
+                        System.out.println("病人已满足出院条件");
                     break;
                 default:
                     is_input_wrong = true;
