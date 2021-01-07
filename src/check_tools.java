@@ -26,6 +26,7 @@ public class check_tools {
     public static void change_area(int level){
 
         if(is_area_has_space_nurse(level)) {
+            System.out.println("需要转入");
             String bed_condition = "where patient_ID=0 and area=" + level;
             ArrayList<bed> beds = select_tools.getBed(bed_condition);
             String nurse_condition = "where max_patient_num > actual_patient_num and area=" + level;
@@ -67,6 +68,20 @@ public class check_tools {
                         update_pnb(SQL, bed_SQL, SQL_nurse);
                         currentNum++;
                     }else {
+                        System.out.println("level size:"+patients_level.size());
+                        System.out.println("currentNum:"+currentNum);
+                        System.out.println("isolation size:"+patients_isolation.size());
+                        //把原先bed和nurse的patientID置0
+                        int old_area = patients_level.get(currentNum-patients_isolation.size()).getArea();
+                        int old_bed_id = patients_level.get(currentNum-patients_isolation.size()).getBed_ID();
+                        String old_bed_SQL = "update bed set patient_ID=0 where ID="+old_bed_id;
+                        update_tools.update(old_bed_SQL);
+                        int old_nurse_id = patients_level.get(currentNum-patients_isolation.size()).getNurse_ID();
+                        String old_nurse_condition = "where ID="+old_nurse_id;
+                        ArrayList<ward_nurse> old_nurse = select_tools.get_ward_nurse(old_nurse_condition);
+                        old_nurse.get(0).setActual_patient_num(old_nurse.get(0).getActual_patient_num()-1);
+                        update_tools.update_nurse(old_nurse.get(0));
+
                         String SQL = "update patient set area=" + level + ",bed_ID=" + beds.get(currentNum).getID() + ",nurse_ID=" +
                                 ward_nurses.get(i).getID() + " where ID=" + patients_level.get(currentNum-patients_isolation.size()).getID();
                         String bed_SQL = "update bed set patient_ID=" + patients_level.get(currentNum-patients_isolation.size()).getID() + " where ID=" + beds.get(currentNum).getID();
@@ -74,6 +89,9 @@ public class check_tools {
                         ward_nurses.get(i).setActual_patient_num(ward_nurses.get(i).getActual_patient_num() + 1);
                         update_pnb(SQL, bed_SQL, SQL_nurse);
                         currentNum++;
+                        System.out.println("here");
+
+                        change_area(old_area);
                     }
 
                 }

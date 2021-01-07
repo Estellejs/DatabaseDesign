@@ -18,7 +18,6 @@ public class select_tools {
             rs = ps.executeQuery();
             while (rs.next()) {
                 area = rs.getInt(1);
-                System.out.println(area);
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
