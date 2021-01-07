@@ -105,6 +105,7 @@ public class Application {
                     }
                     if (check_tools.is_area_has_space_nurse(1)){
                         update_tools.change_area(patient,1);
+                        check_tools.change_area(patient.getArea());
                         System.out.println("病人已成功转区域");
                     }else {
                         System.out.println("没有空闲，专区域失败");
@@ -115,6 +116,7 @@ public class Application {
                     update_tools.update(sql);
                     if (check_tools.is_area_has_space_nurse(2)){
                         update_tools.change_area(patient,2);
+                        check_tools.change_area(patient.getArea());
                         System.out.println("病人已成功转区域");
                     }else {
                         System.out.println("没有空闲，专区域失败");
@@ -126,6 +128,7 @@ public class Application {
                     if (check_tools.is_area_has_space_nurse(3)){
                         update_tools.change_area(patient,3);
                         System.out.println("病人已成功转区域");
+                        check_tools.change_area(patient.getArea());
                     }else {
                         System.out.println("没有空闲，转区域失败");
                     }
