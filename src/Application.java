@@ -108,7 +108,7 @@ public class Application {
                         check_tools.change_area(patient.getArea());
                         System.out.println("病人已成功转区域");
                     }else {
-                        System.out.println("没有空闲，专区域失败");
+                        System.out.println("没有空闲，转区域失败");
                     }
                     break;
                 case "12":
@@ -119,7 +119,7 @@ public class Application {
                         check_tools.change_area(patient.getArea());
                         System.out.println("病人已成功转区域");
                     }else {
-                        System.out.println("没有空闲，专区域失败");
+                        System.out.println("没有空闲，转区域失败");
                     }
                     break;
                 case "13":
