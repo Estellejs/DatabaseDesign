@@ -213,11 +213,13 @@ public class update_tools {
                    input = scanner.next();
                    sql = "update "+table_name+" set name='"+input+"' where ID="+person_ID;
                    update(sql);
+                   break;
                 case "2":
                     System.out.println("请输入新密码：");
                     input = scanner.next();
                     sql = "update " + table_name + " set password='" + input + "' where ID=" + person_ID;
                     update(sql);
+                    break;
                 default:
                     is_change = true;
                     System.out.println("输入错误，请重新输入。");

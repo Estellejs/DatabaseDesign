@@ -110,10 +110,10 @@ public class select_tools {
                 String result="";
                 if (tests.size()>0) {
                     for (int j = 0; j < tests.size(); j++) {
-                        result += tests.get(j).getDate() + tests.get(j).getResult() + ";";
+                        result += tests.get(j).getDate() +" "+ tests.get(j).getResult() + ";";
                     }
                 }
-                System.out.println(patient.getID()+"  病情评级："+level+"  区域："+strArea+"  温度："+patient.getTemperature()+"  生命状态："+state+"  核酸检测结果:"+result);
+                System.out.println("ID:"+patient.getID()+" 姓名："+patient.getName()+"  病情评级："+level+"  区域："+strArea+"  温度："+patient.getTemperature()+"  生命状态："+state+"  核酸检测结果:"+result);
             }
         }
     }
