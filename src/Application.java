@@ -162,8 +162,6 @@ public class Application {
                     update_tools.insert_test(patient);
                     condition="where ID="+patient.getID();
                     patient=select_tools.get_patient_information(condition).get(0);
-                    if (check_tools.checkIfRecovery(patient))
-                        System.out.println("病人已满足出院条件");
                     break;
                 default:
                     is_input_wrong = true;

@@ -113,22 +113,55 @@ public class update_tools {
     public static void insert_test(patient patient){
         Connection connection = null;
         PreparedStatement ps=null;
-        //随机生成核酸检测结果
-        Random rand = new Random();
-        int randnum = rand.nextInt(2);
         String result = "";
-        if(randnum==0){
-            result = "阳性";
-            String tempSQL = "update patient set normal_test_num=0 where ID="+patient.getID();
-            update(tempSQL);
-            patient.setNormal_test_num(0);
+        Scanner scanner = new Scanner(System.in);
+        String input = "";
+        boolean is_continue = true;
+        while(is_continue){
+            is_continue = false;
+            System.out.println("请输入核酸检测结果，阳性：1；阴性：2");
+            input = scanner.next();
+            switch (input){
+                case "1":
+                    result = "阳性";
+                    String tempSQL1 = "update patient set normal_test_num=0 where ID="+patient.getID();
+                    update(tempSQL1);
+                    patient.setNormal_test_num(0);
+                    break;
+                case "2":
+                    result = "阴性";
+                    String tempSQL2 = "update patient set normal_test_num=" + (patient.getNormal_test_num() + 1) + " where ID=" + patient.getID();
+                    update(tempSQL2);
+                    patient.setNormal_test_num(patient.getNormal_test_num() + 1);
+                    break;
+                default:
+                    is_continue = true;
+                    System.out.println("输入错误，请重新输入。");
+            }
         }
-        else if(randnum==1){
-            result = "阴性";
-            String tempSQL = "update patient set normal_test_num="+ (patient.getNormal_test_num()+1) +" where ID="+patient.getID();
-            update(tempSQL);
-            patient.setNormal_test_num(patient.getNormal_test_num()+1);
+
+        is_continue = true;
+        int level = 0;
+        while(is_continue){
+            is_continue = false;
+            System.out.println("请输入病情评级，轻症：1；重症：2；危重症：3");
+            input = scanner.next();
+            switch (input){
+                case "1":
+                    level = 1;
+                    break;
+                case "2":
+                    level = 2;
+                    break;
+                case "3":
+                    level = 3;
+                    break;
+                default:
+                    is_continue = true;
+                    System.out.println("输入错误，请重新输入。");
+            }
         }
+
         Date date = new Date();
         java.sql.Date sqlDate = new java.sql.Date(date.getTime());
         String sql = "insert into test(patient_ID,result,date,current_level) values(?,?,?,?)";
@@ -138,13 +171,31 @@ public class update_tools {
             ps.setInt(1,patient.getID());
             ps.setString(2,result);
             ps.setDate(3,sqlDate);
-            ps.setInt(4,patient.getLevel());
+            ps.setInt(4,level);
             ps.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }finally {
             JDBCTool.releaseDB(null,ps,connection);
+        }
+
+
+        //若病情评级与原先不同，修改病人信息并尝试转区域
+        int old_level = patient.getLevel();
+        patient.setLevel(level);
+        if (check_tools.checkIfRecovery(patient))
+            System.out.println("病人已满足出院条件");
+        if (old_level != level) {
+            sql = "update patient set level=" + level + " where ID=" + patient.getID();
+            update_tools.update(sql);
+            if (check_tools.is_area_has_space_nurse(level)) {
+                update_tools.change_area(patient, level);
+                check_tools.change_area(patient.getArea());
+                System.out.println("病人已成功转区域");
+            } else {
+                System.out.println("没有空闲，转区域失败");
+            }
         }
     }
 
