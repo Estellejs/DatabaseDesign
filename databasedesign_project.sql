@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 80019
 File Encoding         : 65001
 
-Date: 2021-01-05 22:13:35
+Date: 2021-01-07 14:40:36
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -139,8 +139,8 @@ CREATE TABLE `patient` (
   `level` int NOT NULL,
   `area` int NOT NULL,
   `bed_ID` int DEFAULT NULL,
-  `tempreature` varchar(255) DEFAULT NULL,
-  `normal_tempreature_num` int(10) unsigned zerofill DEFAULT NULL,
+  `temperature` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `normal_temperature_num` int(10) unsigned zerofill DEFAULT NULL,
   `normal_test_num` int(10) unsigned zerofill DEFAULT NULL,
   `nurse_ID` int DEFAULT NULL,
   `state` int NOT NULL,
