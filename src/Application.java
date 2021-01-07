@@ -98,6 +98,10 @@ public class Application {
                 case "11":
                     sql="update patient set level=1 where ID="+patient.getID();
                     update_tools.update(sql);
+                    patient.setLevel(1);
+                    if (check_tools.checkIfRecovery(patient)){
+                        System.out.println("病人已满足出院条件");
+                    }
                     if (check_tools.is_area_has_space_nurse(1)){
                         update_tools.change_area(patient,1);
                         System.out.println("病人已成功转区域");
@@ -139,6 +143,10 @@ public class Application {
                     break;
                 case "3":
                     update_tools.insert_test(patient);
+                    String condition="where ID="+patient.getID();
+                    patient=select_tools.get_patient_information(condition).get(0);
+                    if (check_tools.checkIfRecovery(patient))
+                        System.out.println("病人已满足出院条件");
                     break;
                 default:
                     is_input_wrong = true;
