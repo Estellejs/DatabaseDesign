@@ -203,9 +203,13 @@ public class Application {
                                         String patientID = scanner.next();
                                         condition = "where ID='" + patientID + "' and area='" + doctor.getArea() + "'";
                                         patients = select_tools.get_patient_information(condition);
-                                        if (patients.size() > 0){
+                                        if (patients.size() > 0 && patients.get(0).getState()==0){
                                             doctor_change_patient_information(doctor, patients.get(0));
                                             break;
+                                        }else if(patients.get(0).getState()==-1){
+                                            System.out.println("病人已去世，不能修改信息。");
+                                        }else if(patients.get(0).getState()==1){
+                                            System.out.println("病人已康复出院，不能修改信息。");
                                         }
                                         else {
                                             System.out.println("输入错误，请重新输入。");
