@@ -25,74 +25,107 @@ public class check_tools {
 //增加护士，有病人出院或病故时，从其他区域转入，level
     public static void change_area(int level){
 
-
         if(is_area_has_space_nurse(level)) {
             String bed_condition = "where patient_ID=0 and area=" + level;
             ArrayList<bed> beds = select_tools.getBed(bed_condition);
             String nurse_condition = "where max_patient_num > actual_patient_num and area=" + level;
-            ArrayList<ward_nurse> ward_nursesl = select_tools.get_ward_nurse(nurse_condition);
+
+            //有空闲的护士
             ArrayList<ward_nurse> ward_nurses = select_tools.get_ward_nurse(nurse_condition);
 
-            for (int i = 0; i < ward_nursesl.size(); i++) {
-                for (int j = ward_nursesl.get(i).getActual_patient_num(); j < ward_nursesl.get(i).getMax_patient_num(); j++) {
-                    ward_nurses.add(ward_nursesl.get(i));
-                }
+            //护士可以接收的病人数
+            int nurse_num = 0;
+            for(int i=0;i<ward_nurses.size();i++){
+                nurse_num += ward_nurses.get(i).getMax_patient_num()-ward_nurses.get(i).getActual_patient_num();
             }
-            System.out.println(ward_nurses.size() + "  " + ward_nursesl.size());
+
             //隔离区
-            ArrayList<patient> patients_isolation = new ArrayList<>();
-            ArrayList<patient> patients_level = new ArrayList<>();
+            ArrayList<patient> patients_isolation = new ArrayList<>();     //在隔离区的病人数量
+            ArrayList<patient> patients_level = new ArrayList<>();        //在其他区域的病人数量
             String condition = "where area=4 and level=" + level;
             patients_isolation = select_tools.get_patient_information(condition);
             condition = "where area<4 and area!=" + level + " and level=" + level;
             patients_level = select_tools.get_patient_information(condition);
             int max_space = beds.size();
-            if (max_space > ward_nurses.size()) {
-                max_space = ward_nurses.size();
+            if (max_space > nurse_num) {
+                max_space = nurse_num;
             }
 
+            int currentNum = 0;
+            label:
+            for(int i=0;i<ward_nurses.size();i++){
+                int tempNum = ward_nurses.get(i).getMax_patient_num()-ward_nurses.get(i).getActual_patient_num();
+                for(int j=0;j<tempNum;j++){
+                    if(currentNum==max_space)
+                        break label;
+                    else if(currentNum<patients_isolation.size()){
+                        String SQL = "update patient set area=" + level + ",bed_ID=" + beds.get(currentNum).getID() + ",nurse_ID=" +
+                                ward_nurses.get(i).getID() + " where ID=" + patients_isolation.get(currentNum).getID();
+                        String bed_SQL = "update bed set patient_ID=" + patients_isolation.get(currentNum).getID() + " where ID=" + beds.get(currentNum).getID();
+                        String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(i).getActual_patient_num() + 1) + " where ID=" + ward_nurses.get(i).getID();
+                        ward_nurses.get(i).setActual_patient_num(ward_nurses.get(i).getActual_patient_num()+1);
+                        update_pnb(SQL, bed_SQL, SQL_nurse);
+                        currentNum++;
+                    }else {
+                        String SQL = "update patient set area=" + level + ",bed_ID=" + beds.get(currentNum).getID() + ",nurse_ID=" +
+                                ward_nurses.get(i).getID() + " where ID=" + patients_level.get(currentNum-patients_isolation.size()).getID();
+                        String bed_SQL = "update bed set patient_ID=" + patients_level.get(currentNum-patients_isolation.size()).getID() + " where ID=" + beds.get(currentNum).getID();
+                        String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(i).getActual_patient_num() + 1) + " where ID=" + ward_nurses.get(i).getID();
+                        ward_nurses.get(i).setActual_patient_num(ward_nurses.get(i).getActual_patient_num() + 1);
+                        update_pnb(SQL, bed_SQL, SQL_nurse);
+                        currentNum++;
+                    }
 
-            if (max_space < patients_isolation.size()) {
-                for (int i = 0; i < max_space; i++) {
-                    String SQL = "update patient set area=" + level + ",bed_ID=" + beds.get(i).getID() + ",nurse_ID=" +
-                            ward_nurses.get(i).getID() + " where ID=" + patients_isolation.get(i).getID();
-                    String bed_SQL = "update bed set patient_ID=" + patients_isolation.get(i).getID() + " where ID=" + beds.get(i).getID();
-                    String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(i).getActual_patient_num() + 1) + " where ID=" + ward_nurses.get(i).getID();
-                    update_pnb(SQL, bed_SQL, SQL_nurse);
-
                 }
-            } else if (max_space < (patients_isolation.size() + patients_level.size())) {
-                for (int i = 0; i < patients_isolation.size(); i++) {
-                    String SQL = "update patient set area=" + level + ",bed_ID=" + beds.get(i).getID() + ",nurse_ID=" +
-                            ward_nurses.get(i).getID() + " where ID=" + patients_isolation.get(i).getID();
-                    String bed_SQL = "update bed set patient_ID=" + patients_isolation.get(i).getID() + " where ID=" + beds.get(i).getID();
-                    String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(i).getActual_patient_num() + 1) + " where ID=" + ward_nurses.get(i).getID();
-                    update_pnb(SQL, bed_SQL, SQL_nurse);
-                }
-                for (int i = 0; i < (max_space - patients_isolation.size()); i++) {
-                    String SQL = "update patient set area=" + level + ",bed_ID=" + beds.get(i + patients_isolation.size()).getID() + ",nurse_ID=" +
-                            ward_nurses.get(i + patients_isolation.size()).getID() + " where ID=" + patients_level.get(i).getID();
-                    String bed_SQL = "update bed set patient_ID=" + patients_level.get(i).getID() + " where ID=" + beds.get(i + patients_isolation.size()).getID();
-                    String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(i + patients_isolation.size()).getActual_patient_num() + 1) + " where ID=" + ward_nurses.get(i + patients_isolation.size()).getID();
-                    update_pnb(SQL, bed_SQL, SQL_nurse);
-                }
-            } else {
-                for (int i = 0; i < patients_isolation.size(); i++) {
-                    String SQL = "update patient set area=" + level + ",bed_ID=" + beds.get(i).getID() + ",nurse_ID=" +
-                            ward_nurses.get(i).getID() + " where ID=" + patients_isolation.get(i).getID();
-                    String bed_SQL = "update bed set patient_ID=" + patients_isolation.get(i).getID() + " where ID=" + beds.get(i).getID();
-                    String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(i).getActual_patient_num() + 1) + " where ID=" + ward_nurses.get(i).getID();
-                    update_pnb(SQL, bed_SQL, SQL_nurse);
-                }
-                for (int i = 0; i < patients_level.size(); i++) {
-                    String SQL = "update patient set area=" + level + ",bed_ID=" + beds.get(i + patients_isolation.size()).getID() + ",nurse_ID=" +
-                            ward_nurses.get(i + patients_isolation.size()).getID() + " where ID=" + patients_level.get(i).getID();
-                    String bed_SQL = "update bed set patient_ID=" + patients_level.get(i).getID() + " where ID=" + beds.get(i + patients_isolation.size()).getID();
-                    String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(i + patients_isolation.size()).getActual_patient_num() + 1) + " where ID=" + ward_nurses.get(i + patients_isolation.size()).getID();
-                    update_pnb(SQL, bed_SQL, SQL_nurse);
-                }
-
             }
+
+//
+//            if (max_space < patients_isolation.size()) {
+//                for (int i = 0; i < max_space; i++) {
+//                    String SQL = "update patient set area=" + level + ",bed_ID=" + beds.get(i).getID() + ",nurse_ID=" +
+//                            ward_nurses.get(i).getID() + " where ID=" + patients_isolation.get(i).getID();
+//                    String bed_SQL = "update bed set patient_ID=" + patients_isolation.get(i).getID() + " where ID=" + beds.get(i).getID();
+//                    String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(i).getActual_patient_num() + 1) + " where ID=" + ward_nurses.get(i).getID();
+//                    ward_nurses.get(i).setActual_patient_num(ward_nurses.get(i).getActual_patient_num()+1);
+//                    update_pnb(SQL, bed_SQL, SQL_nurse);
+//
+//                }
+//            } else if (max_space < (patients_isolation.size() + patients_level.size())) {
+//                for (int i = 0; i < patients_isolation.size(); i++) {
+//                    String SQL = "update patient set area=" + level + ",bed_ID=" + beds.get(i).getID() + ",nurse_ID=" +
+//                            ward_nurses.get(i).getID() + " where ID=" + patients_isolation.get(i).getID();
+//                    String bed_SQL = "update bed set patient_ID=" + patients_isolation.get(i).getID() + " where ID=" + beds.get(i).getID();
+//                    String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(i).getActual_patient_num() + 1) + " where ID=" + ward_nurses.get(i).getID();
+//                    ward_nurses.get(i).setActual_patient_num(ward_nurses.get(i).getActual_patient_num()+1);
+//                    update_pnb(SQL, bed_SQL, SQL_nurse);
+//                }
+//                for (int i = 0; i < (max_space - patients_isolation.size()); i++) {
+//                    String SQL = "update patient set area=" + level + ",bed_ID=" + beds.get(i + patients_isolation.size()).getID() + ",nurse_ID=" +
+//                            ward_nurses.get(i + patients_isolation.size()).getID() + " where ID=" + patients_level.get(i).getID();
+//                    String bed_SQL = "update bed set patient_ID=" + patients_level.get(i).getID() + " where ID=" + beds.get(i + patients_isolation.size()).getID();
+//                    String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(i + patients_isolation.size()).getActual_patient_num() + 1) + " where ID=" + ward_nurses.get(i + patients_isolation.size()).getID();
+//                    ward_nurses.get(i + patients_isolation.size()).setActual_patient_num(ward_nurses.get(i + patients_isolation.size()).getActual_patient_num() + 1);
+//                    update_pnb(SQL, bed_SQL, SQL_nurse);
+//                }
+//            } else {
+//                for (int i = 0; i < patients_isolation.size(); i++) {
+//                    String SQL = "update patient set area=" + level + ",bed_ID=" + beds.get(i).getID() + ",nurse_ID=" +
+//                            ward_nurses.get(i).getID() + " where ID=" + patients_isolation.get(i).getID();
+//                    String bed_SQL = "update bed set patient_ID=" + patients_isolation.get(i).getID() + " where ID=" + beds.get(i).getID();
+//                    String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(i).getActual_patient_num() + 1) + " where ID=" + ward_nurses.get(i).getID();
+//                    ward_nurses.get(i).setActual_patient_num(ward_nurses.get(i).getActual_patient_num()+1);
+//                    update_pnb(SQL, bed_SQL, SQL_nurse);
+//                }
+//                for (int i = 0; i < patients_level.size(); i++) {
+//                    String SQL = "update patient set area=" + level + ",bed_ID=" + beds.get(i + patients_isolation.size()).getID() + ",nurse_ID=" +
+//                            ward_nurses.get(i + patients_isolation.size()).getID() + " where ID=" + patients_level.get(i).getID();
+//                    String bed_SQL = "update bed set patient_ID=" + patients_level.get(i).getID() + " where ID=" + beds.get(i + patients_isolation.size()).getID();
+//                    String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(i + patients_isolation.size()).getActual_patient_num() + 1) + " where ID=" + ward_nurses.get(i + patients_isolation.size()).getID();
+//                    ward_nurses.get(i + patients_isolation.size()).setActual_patient_num(ward_nurses.get(i + patients_isolation.size()).getActual_patient_num() + 1);
+//                    update_pnb(SQL, bed_SQL, SQL_nurse);
+//                }
+//
+//            }
 
 
         }

@@ -14,9 +14,9 @@ public class Application {
 
         while (true){
             System.out.println("请选择登录身份：1 主治医生；2 护士长；3 急诊护士；4 病房护士\n退出：q");
-            String identity=scanner.next();
             boolean is_input_wrong=true;
             while (is_input_wrong) {
+                String identity=scanner.next();
                 is_input_wrong=false;
                 String table_name="";
                 switch (identity) {
@@ -482,7 +482,7 @@ public class Application {
                         while (true){
                             try {
                                 int bed_id = Integer.parseInt(scanner.next());
-                                condition = "where ID=" + bed_id + "' and area='" + chief_nurse.getArea() + "'";
+                                condition = "where ID=" + bed_id + " and area='" + chief_nurse.getArea() + "'";
                                 beds = select_tools.getBed(condition);
                                 if (beds.size() > 0) {
                                     condition = "where ID=" + beds.get(0).getPatient_ID();
