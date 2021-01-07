@@ -136,7 +136,7 @@ public class Application {
         int doctorID= Login.login(table_name);
         doctor doctor=new doctor(doctorID);
         while (true){
-            System.out.println("以查看当前治疗区域的病人信息：patient；以查看当前治疗区域的护士长及病房护士信息：nurse；决定病人是否出院：leave；重新登陆：r；退出：q；");
+            System.out.println("以查看当前治疗区域的病人信息：patient；以查看当前治疗区域的护士长及病房护士信息：nurse；决定病人是否出院：leave；修改个人信息：change；重新登陆：r；退出：q；");
             boolean is_operation_wrong=true;
             String operation="";
             operation = scanner.next();
@@ -251,6 +251,9 @@ public class Application {
                         update_tools.update(SQL);
 
                         break;
+                    case "change":
+                        update_tools.update_personal_information(table_name,doctorID);
+                        break;
                     case "q":
                         System.exit(0);
                         break;
@@ -275,7 +278,7 @@ public class Application {
         String SQL="select * from chief_nurse where ID="+chief_nurse_id;
         chief_nurse chief_nurse= select_tools.getChief_nurse(SQL);
         while (true){
-            System.out.println("以查看当前治疗区域的病人信息：patient；以查看当前治疗区域的病房护士信息：nurse；\n查看病床信息：bed；查看病床的病人信息：bed_patient；重新登陆：r；退出：q；");
+            System.out.println("以查看当前治疗区域的病人信息：patient；以查看当前治疗区域的病房护士信息：nurse；\n查看病床信息：bed；查看病床的病人信息：bed_patient；\n修改个人信息：change；重新登陆：r；退出：q；");
             boolean is_operation_wrong=true;
             String operation="";
             operation = scanner.next();
@@ -410,6 +413,9 @@ public class Application {
                             }
                         }
                         break;
+                    case "change":
+                        update_tools.update_personal_information(table_name,chief_nurse_id);
+                        break;
                     case "q":
                         System.exit(0);
                         break;
@@ -488,7 +494,7 @@ public class Application {
         int emergency_nurse_id=Login.login(table_name);
 
         while (true){
-            System.out.println("查看病人信息：patient；登记病人信息：register；重新登陆：r；退出：q；");
+            System.out.println("查看病人信息：patient；登记病人信息：register；\n修改个人信息：change；重新登陆：r；退出：q；");
             boolean is_operation_wrong=true;
             String operation="";
             operation = scanner.next();
@@ -528,6 +534,9 @@ public class Application {
                             }
                         }
                         update_tools.insert_patient(name,level);
+                        break;
+                    case "change":
+                        update_tools.update_personal_information(table_name,emergency_nurse_id);
                         break;
                     case "q":
                         System.exit(0);
@@ -597,7 +606,7 @@ public class Application {
         String condition="";
 
         while (true){
-            System.out.println("查看病人信息：patient；更新病人信息：update；重新登陆：r；退出：q；");
+            System.out.println("查看病人信息：patient；更新病人信息：update；\n修改个人信息：change；重新登陆：r；退出：q；");
             boolean is_operation_wrong=true;
             String operation="";
             operation = scanner.next();
@@ -651,6 +660,9 @@ public class Application {
                         }
                         patient.setNormal_temperature_num(normal_temperature_num);
                         update_tools.update_temperature(patient);
+                        break;
+                    case "change":
+                        update_tools.update_personal_information(table_name,ward_nurse_id);
                         break;
                     case "q":
                         System.exit(0);

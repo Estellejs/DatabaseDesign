@@ -2,6 +2,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
+import java.util.Scanner;
 
 public class update_tools {
 
@@ -133,5 +134,30 @@ public class update_tools {
         }
     }
 
-
+    public static void update_personal_information(String table_name,int person_ID){
+        Scanner scanner=new Scanner(System.in);
+        String sql = "";
+        boolean is_change = true;
+        while (is_change){
+            is_change = false;
+            System.out.println("修改用户名：1，修改密码：2");
+            String input = scanner.next();
+            switch (input){
+                case "1":
+                   System.out.println("请输入新用户名：");
+                   input = scanner.next();
+                   sql = "update "+table_name+" set name='"+input+"' where ID="+person_ID;
+                   update(sql);
+                case "2":
+                    System.out.println("请输入新密码：");
+                    input = scanner.next();
+                    sql = "update " + table_name + " set password='" + input + "' where ID=" + person_ID;
+                    update(sql);
+                default:
+                    is_change = true;
+                    System.out.println("输入错误，请重新输入。");
+                    break;
+            }
+        }
+    }
 }
