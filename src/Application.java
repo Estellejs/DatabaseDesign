@@ -147,8 +147,7 @@ public class Application {
                     sql = "update patient set state=-1, bed_ID=0,nurse_ID=0 where ID=" + patient.getID();
                     update_tools.update(sql);
                     //原先床位patient_ID置0
-                    int old_bed_id = patient.getBed_ID();
-                    condition = "where ID=" + old_bed_id;
+                    condition = "where patient_ID=" + patient.getID();
                     ArrayList<bed> old_bed = select_tools.getBed(condition);
                     old_bed.get(0).setPatient_ID(0);
                     update_tools.update_bed(old_bed.get(0));
@@ -305,7 +304,7 @@ public class Application {
                                 System.out.println("输入错误，请重新输入。");
                             }
                         }
-                        String SQL = "update patient set state=1,bed_ID=0,nurse_ID=0 where ID=" + patient.getID();
+                        String SQL = "update patient set state=1,nurse_ID=0 where ID=" + patient.getID();
 
                         condition = "where ID=" + patient.getNurse_ID();
                         ArrayList<ward_nurse> ward_nurses = select_tools.get_ward_nurse(condition);
@@ -313,7 +312,7 @@ public class Application {
                             String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(0).getActual_patient_num() - 1) + " where ID=" + ward_nurses.get(0).getID();
                             update_tools.update(SQL_nurse);
                         }
-                        condition = "where ID=" + patient.getBed_ID();
+                        condition = "where patient_ID=" + patient.getID();
                         ArrayList<bed> beds = select_tools.getBed(condition);
                         if (beds.size() > 0) {
                             String SQL_bed = "update bed set patient_ID = 0 where ID=" + beds.get(0).getID();
@@ -446,7 +445,7 @@ public class Application {
                                                 String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nursesl.get(0).getActual_patient_num() + 1) + " where ID=" + ward_nursesl.get(0).getID();
                                                 update_tools.update(SQL_nurse);
                                             } else {
-                                                String SQL_patients = "update patient set area=4,bed_ID=0,nurse_ID=0 where ID=" + patients.get(i).getID();
+                                                String SQL_patients = "update patient set area=4,nurse_ID=0 where ID=" + patients.get(i).getID();
                                                 condition = "where patient_ID=" + patients.get(i).getID();
                                                 ArrayList<bed> beds1 = select_tools.getBed(condition);
                                                 if (beds1.size() > 0) {

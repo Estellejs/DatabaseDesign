@@ -60,7 +60,7 @@ public class check_tools {
                     if(currentNum==max_space)
                         break label;
                     else if(currentNum<patients_isolation.size()){
-                        String SQL = "update patient set area=" + level + ",bed_ID=" + beds.get(currentNum).getID() + ",nurse_ID=" +
+                        String SQL = "update patient set area=" + level+ ",nurse_ID=" +
                                 ward_nurses.get(i).getID() + " where ID=" + patients_isolation.get(currentNum).getID();
                         String bed_SQL = "update bed set patient_ID=" + patients_isolation.get(currentNum).getID() + " where ID=" + beds.get(currentNum).getID();
                         String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(i).getActual_patient_num() + 1) + " where ID=" + ward_nurses.get(i).getID();
@@ -73,8 +73,7 @@ public class check_tools {
                         System.out.println("isolation size:"+patients_isolation.size());
                         //把原先bed和nurse的patientID置0
                         int old_area = patients_level.get(currentNum-patients_isolation.size()).getArea();
-                        int old_bed_id = patients_level.get(currentNum-patients_isolation.size()).getBed_ID();
-                        String old_bed_SQL = "update bed set patient_ID=0 where ID="+old_bed_id;
+                        String old_bed_SQL = "update bed set patient_ID=0 where patient_ID="+patients_level.get(currentNum-patients_isolation.size()).getID();
                         update_tools.update(old_bed_SQL);
                         int old_nurse_id = patients_level.get(currentNum-patients_isolation.size()).getNurse_ID();
                         String old_nurse_condition = "where ID="+old_nurse_id;
@@ -82,7 +81,7 @@ public class check_tools {
                         old_nurse.get(0).setActual_patient_num(old_nurse.get(0).getActual_patient_num()-1);
                         update_tools.update_nurse(old_nurse.get(0));
 
-                        String SQL = "update patient set area=" + level + ",bed_ID=" + beds.get(currentNum).getID() + ",nurse_ID=" +
+                        String SQL = "update patient set area=" + level + ",nurse_ID=" +
                                 ward_nurses.get(i).getID() + " where ID=" + patients_level.get(currentNum-patients_isolation.size()).getID();
                         String bed_SQL = "update bed set patient_ID=" + patients_level.get(currentNum-patients_isolation.size()).getID() + " where ID=" + beds.get(currentNum).getID();
                         String SQL_nurse = "update ward_nurse set actual_patient_num=" + (ward_nurses.get(i).getActual_patient_num() + 1) + " where ID=" + ward_nurses.get(i).getID();

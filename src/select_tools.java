@@ -42,12 +42,11 @@ public class select_tools {
                 String name=rs.getString("name");
                 int level=rs.getInt("level");
                 int area=rs.getInt("area");
-                int bed_ID=rs.getInt("bed_ID");
                 int normal_temperature_num=rs.getInt("normal_temperature_num");
                 int normal_test_num=rs.getInt("normal_test_num");
                 int nurse_ID=rs.getInt("nurse_ID");
                 int state=rs.getInt("state");
-                patient patient=new patient( ID,  name,  level,  area,  bed_ID,
+                patient patient=new patient( ID,  name,  level,  area,
                  normal_temperature_num, normal_test_num,  nurse_ID,state);
                 patient_list.add(patient);
             }

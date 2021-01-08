@@ -5,7 +5,6 @@ public class patient {
     String name;
     int level;
     int area;
-    int bed_ID;
     int normal_temperature_num;
     int normal_test_num;
     int nurse_ID;
@@ -25,9 +24,6 @@ public class patient {
         return ID;
     }
 
-    public int getBed_ID() {
-        return bed_ID;
-    }
 
     public void setID(int ID) {
         this.ID = ID;
@@ -53,9 +49,6 @@ public class patient {
         return name;
     }
 
-    public void setBed_ID(int bed_ID) {
-        this.bed_ID = bed_ID;
-    }
 
     public void setLevel(int level) {
         this.level = level;
@@ -86,13 +79,12 @@ public class patient {
         this.state = state;
     }
 
-    public patient(int ID, String name, int level, int area, int bed_ID,
+    public patient(int ID, String name, int level, int area,
                    int normal_temperature_num, int normal_test_num, int nurse_ID, int state) {
         this.ID = ID;
         this.name = name;
         this.level = level;
         this.area = area;
-        this.bed_ID = bed_ID;
         this.state = state;
         this.normal_temperature_num = normal_temperature_num;
         this.normal_test_num = normal_test_num;
