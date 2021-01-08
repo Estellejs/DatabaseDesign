@@ -389,13 +389,18 @@ public class Application {
                                             System.out.println("请输入病房护士ID：");
                                             ward_nurse_id = Integer.parseInt(scanner.next());
                                             is_input_true = false;
+                                            condition = "where nurse_ID=" + ward_nurse_id+" and area="+chief_nurse.getArea();
+                                            patients = select_tools.get_patient_information(condition);
+                                            if(patients.size()>0)
+                                                select_tools.print_patients(patients);
+                                            else{
+                                                is_input_true = true;
+                                                System.out.println("ID不存在或不属于当前区域，请重新输入。");
+                                            }
                                         } catch (NumberFormatException e) {
                                             System.out.println("输入错误，请重新输入。");
                                         }
                                     }
-                                    condition = "where nurse_ID=" + ward_nurse_id;
-                                    patients = select_tools.get_patient_information(condition);
-                                    select_tools.print_patients(patients);
                                     break;
                                 case "3":
                                     condition = "where area=0";
