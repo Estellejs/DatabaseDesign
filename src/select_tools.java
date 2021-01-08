@@ -174,7 +174,7 @@ public class select_tools {
             while (rs.next()) {
                 int ID=rs.getInt("ID");
                 String result=rs.getString("result");
-                Date date=rs.getDate("date");
+                Timestamp date=rs.getTimestamp("date");
                 int current_level=rs.getInt("current_level");
                 test test=new test(ID,patientID,result,date,current_level);
                 tests.add(test);

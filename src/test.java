@@ -1,12 +1,13 @@
 import java.sql.Date;
+import java.sql.Timestamp;
 
 public class test {
     int ID;
     int patient_ID;
     String result;
-    Date date;
+    Timestamp date;
     int current_level;
-    public test(int ID, int patient_ID, String result, Date date, int current_level){
+    public test(int ID, int patient_ID, String result, Timestamp date, int current_level){
         this.ID=ID;
         this.patient_ID=patient_ID;
         this.result=result;
@@ -22,7 +23,7 @@ public class test {
         return ID;
     }
 
-    public Date getDate() {
+    public Timestamp getDate() {
         return date;
     }
 
@@ -42,7 +43,7 @@ public class test {
         this.current_level = current_level;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Timestamp date) {
         this.date = date;
     }
 

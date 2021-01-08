@@ -1,4 +1,7 @@
+import com.sun.corba.se.impl.orb.ParserTable;
+
 import java.sql.*;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
@@ -16,7 +19,7 @@ public class update_tools {
         ResultSet bed_rs=null;
         PreparedStatement nurse_ps=null;
         PreparedStatement bed_ps=null;
-        String SQL="insert into patient(name,level,area,bed_ID,normal_temperature_num,normal_test_num,nurse_ID,state) values(?,?,?,?,0,0,?,0)";
+        String SQL="insert into patient(name,level,area,normal_temperature_num,normal_test_num,nurse_ID,state) values(?,?,?,0,0,?,0)";
         try {
             connection= JDBCTool.getMySQLConn();
             ps=connection.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS);
@@ -29,8 +32,7 @@ public class update_tools {
                 ArrayList<bed> beds=select_tools.getBed(bed_condition);
                 String nurse_condition="where max_patient_num > actual_patient_num and area="+level;
                 ArrayList<ward_nurse> ward_nurses=select_tools.get_ward_nurse(nurse_condition);
-                ps.setInt(4,beds.get(0).getID());
-                ps.setInt(5,ward_nurses.get(0).getID());
+                ps.setInt(4,ward_nurses.get(0).getID());
                 nurse_conn= JDBCTool.getMySQLConn();
                 String SQL_nurse="update ward_nurse set actual_patient_num="+(ward_nurses.get(0).getActual_patient_num()+1)+" where ID="+ward_nurses.get(0).getID();
                 nurse_ps=nurse_conn.prepareStatement(SQL_nurse);
@@ -105,6 +107,8 @@ public class update_tools {
         Scanner scanner = new Scanner(System.in);
         String input = "";
         boolean is_continue = true;
+        Date date = new Date();
+        Timestamp sqlDate = new Timestamp(date.getTime());
         while(is_continue){
             is_continue = false;
             System.out.println("请输入核酸检测结果，阳性：1；阴性：2");
@@ -118,9 +122,34 @@ public class update_tools {
                     break;
                 case "2":
                     result = "阴性";
-                    String tempSQL2 = "update patient set normal_test_num=" + (patient.getNormal_test_num() + 1) + " where ID=" + patient.getID();
-                    update(tempSQL2);
-                    patient.setNormal_test_num(patient.getNormal_test_num() + 1);
+                    //num等于0，直接＋1
+                    if(patient.getNormal_test_num()==0){
+                        String tempSQL2 = "update patient set normal_test_num=" + (patient.getNormal_test_num() + 1) + " where ID=" + patient.getID();
+                        update(tempSQL2);
+                        patient.setNormal_test_num(patient.getNormal_test_num() + 1);
+                    }
+                    //num等于1，要判断是否间隔24小时
+                    else if(patient.getNormal_test_num()==1) {
+                        ArrayList<test> tests = select_tools.getTest(patient.getID());
+                        boolean if_add = false;
+                        for(int i=0;i<tests.size();i++){
+                            //从最后一次开始遍历
+                            test tempTest = tests.get(tests.size()-1-i);
+                            long time_space = sqlDate.getTime()-tempTest.getDate().getTime();
+                            if(tempTest.getResult().equals("阳性"))
+                                break;
+                            if(time_space>=24*60*60*1000){
+                                if_add = true;
+                                break;
+                            }
+                        }
+                        if(if_add){
+                            String tempSQL2 = "update patient set normal_test_num=" + (patient.getNormal_test_num() + 1) + " where ID=" + patient.getID();
+                            update(tempSQL2);
+                            patient.setNormal_test_num(patient.getNormal_test_num() + 1);
+                        }
+                    }
+                    //num大于等于2可以不变
                     break;
                 default:
                     is_continue = true;
@@ -150,15 +179,13 @@ public class update_tools {
             }
         }
 
-        Date date = new Date();
-        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
         String sql = "insert into test(patient_ID,result,date,current_level) values(?,?,?,?)";
         try {
             connection = JDBCTool.getMySQLConn();
             ps=connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1,patient.getID());
             ps.setString(2,result);
-            ps.setDate(3,sqlDate);
+            ps.setTimestamp(3,sqlDate);
             ps.setInt(4,level);
             ps.executeUpdate();
 

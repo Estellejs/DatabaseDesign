@@ -144,7 +144,7 @@ public class Application {
                     update_tools.update(sql);
                     break;
                 case "23":
-                    sql = "update patient set state=-1, bed_ID=0,nurse_ID=0 where ID=" + patient.getID();
+                    sql = "update patient set state=-1, nurse_ID=0 where ID=" + patient.getID();
                     update_tools.update(sql);
                     //原先床位patient_ID置0
                     condition = "where patient_ID=" + patient.getID();
