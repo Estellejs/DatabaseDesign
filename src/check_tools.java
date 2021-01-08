@@ -52,12 +52,18 @@ public class check_tools {
                 max_space = nurse_num;
             }
 
+            int wait_patient = patients_isolation.size()+patients_level.size();
+
+            int totalRound = max_space;
+            if(wait_patient<max_space)
+                totalRound = wait_patient;
+
             int currentNum = 0;
             label:
             for(int i=0;i<ward_nurses.size();i++){
                 int tempNum = ward_nurses.get(i).getMax_patient_num()-ward_nurses.get(i).getActual_patient_num();
                 for(int j=0;j<tempNum;j++){
-                    if(currentNum==max_space)
+                    if(currentNum==totalRound)
                         break label;
                     else if(currentNum<patients_isolation.size()){
                         String SQL = "update patient set area=" + level+ ",nurse_ID=" +
@@ -68,9 +74,6 @@ public class check_tools {
                         update_pnb(SQL, bed_SQL, SQL_nurse);
                         currentNum++;
                     }else {
-                        System.out.println("level size:"+patients_level.size());
-                        System.out.println("currentNum:"+currentNum);
-                        System.out.println("isolation size:"+patients_isolation.size());
                         //把原先bed和nurse的patientID置0
                         int old_area = patients_level.get(currentNum-patients_isolation.size()).getArea();
                         String old_bed_SQL = "update bed set patient_ID=0 where patient_ID="+patients_level.get(currentNum-patients_isolation.size()).getID();

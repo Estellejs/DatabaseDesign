@@ -53,7 +53,6 @@ public class update_tools {
             } else {
                 ps.setInt(3,4);
                 ps.setInt(4,0);
-                ps.setInt(5,0);
                 ps.executeUpdate();
             }
 
