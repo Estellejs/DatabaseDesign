@@ -7,10 +7,30 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://D:/mysql-connector-java-8.0.19/mysql-connector-java-8.0.19.jar!/" />
+          <root url="jar://D:/111/大三上资料/数据库设计/DatabaseDesign/libs/mysql-connector-java-8.0.21.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://D:/111/大三上资料/数据库设计/DatabaseDesign/libs/sqlite-jdbc-3.7.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://D:/111/大三上资料/数据库设计/DatabaseDesign/libs/sqlite-jdbc-3.7.2.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://D:/111/大三上资料/数据库设计/DatabaseDesign/libs/javacsv.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

@@ -6,18 +6,6 @@ import java.util.Scanner;
 
 public class update_tools {
 
-    public static void update_temperature(patient new_patient){
-        String temperature="";
-        for (int i=0;i<new_patient.getTemperature().size();i++){
-            temperature+=new_patient.getTemperature().get(i)+",";
-        }
-        temperature=temperature.substring(0,temperature.length()-1);
-        String SQL="update patient set temperature='"+temperature+"' , normal_temperature_num="+new_patient.getNormal_temperature_num()+" where ID="+new_patient.getID();
-
-        update(SQL);
-
-    }
-
     public static void insert_patient(String name,int level){
         Connection connection = null;
         ResultSet rs = null;
@@ -257,5 +245,122 @@ public class update_tools {
         sql = "update patient set nurse_ID="+new_nurses.get(0).getID()+" where ID="+patient.getID();
         update(sql);
         update_nurse(new_nurses.get(0));
+    }
+
+    public static void update_record(int ward_nurse_id){
+        Connection connection = null;
+        ResultSet rs = null;
+        PreparedStatement ps=null;
+        System.out.println("请输入病人ID：");
+        Scanner scanner=new Scanner(System.in);
+        String condition="";
+        ArrayList<patient> patients=new ArrayList<>();
+        patient patient = new patient();
+        while (true) {
+            try {
+                int patient_id = Integer.parseInt(scanner.next());
+                condition = "where ID=" + patient_id + " and nurse_ID=" + ward_nurse_id;
+                patients = select_tools.get_patient_information(condition);
+                if (patients.size() > 0) {
+                    patient = patients.get(0);
+                    break;
+                } else {
+                    System.out.println("ID不存在或不是您的病人，请重新输入");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("输入错误，请重新输入");
+            }
+        }
+
+        record new_record=new record();
+        new_record.setPatient_ID(patient.getID());
+        ArrayList<test> tests=select_tools.getTest(patient.getID());
+        String result="无";
+        if (tests.size()>0) {
+            Date date1 = tests.get(0).getDate();
+            result=tests.get(0).getResult();
+            for (int j = 1; j < tests.size(); j++) {
+                if (date1.compareTo(tests.get(j).getDate())<0){
+                    date1=tests.get(j).getDate();
+                    result=tests.get(j).getResult();
+                }
+            }
+        }
+        new_record.setTest_result(result);
+        Date date=new Date();
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+        new_record.setDate(sqlDate);
+
+        //温度
+        System.out.println("请输入病人今天的体温：(例如：37.3)");
+        String temperature = scanner.next();
+        float patient_temperature = 0;
+        while (true) {
+            if (temperature.length() == 4) {
+                if (Character.isDigit(temperature.charAt(0)) && Character.isDigit(temperature.charAt(1)) && Character.isDigit(temperature.charAt(3)) && temperature.charAt(2) == '.') {
+                    patient_temperature=Float.parseFloat(temperature);
+                    new_record.setTemperature(patient_temperature);
+                    break;
+                } else {
+                    System.out.println("输入错误，请重新输入。");
+                    temperature = scanner.next();
+                }
+            } else {
+                System.out.println("输入错误，请重新输入。");
+                temperature = scanner.next();
+            }
+        }
+        int normal_temperature_num = patient.getNormal_temperature_num();
+        if (temperature.compareTo("37.3") < 0) {
+            normal_temperature_num += 1;
+        } else {
+            normal_temperature_num = 0;
+        }
+        patient.setNormal_temperature_num(normal_temperature_num);
+        String SQL="update patient set normal_temperature_num="+normal_temperature_num+" where ID="+patient.getID();
+        update_tools.update(SQL);
+        //生命状态
+        System.out.println("请输入病人今天的生命状态：（1康复住院；2在院治疗；3病亡）");
+        String state = scanner.next();
+        boolean is_input_wrong=true;
+        while (is_input_wrong) {
+            is_input_wrong=false;
+            switch (state){
+                case "1":
+                    new_record.setState(1);
+                    break;
+                case "2":
+                    new_record.setState(0);
+                    break;
+                case "3":
+                    new_record.setState(-1);
+                    break;
+                default:
+                    is_input_wrong=true;
+                    System.out.println("输入错误，请重新输入");
+                    state=scanner.next();
+            }
+        }
+        //症状
+        System.out.println("请输入病人症状：");
+        String symptom=scanner.next();
+        new_record.setSymptom(symptom);
+        SQL="insert into record(patient_ID,state,temperature,symptom,test_result,date) values(?,?,?,?,?,?)";
+        try {
+            connection = JDBCTool.getMySQLConn();
+            ps=connection.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1,patient.getID());
+            ps.setInt(2,new_record.getState());
+            ps.setFloat(3,new_record.getTemperature());
+            ps.setString(4,new_record.getSymptom());
+            ps.setString(5,new_record.getTest_result());
+            ps.setDate(6,new_record.getDate());
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            JDBCTool.releaseDB(null,ps,connection);
+        }
     }
 }

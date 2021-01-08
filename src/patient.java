@@ -6,7 +6,6 @@ public class patient {
     int level;
     int area;
     int bed_ID;
-    ArrayList temperature;
     int normal_temperature_num;
     int normal_test_num;
     int nurse_ID;
@@ -20,9 +19,7 @@ public class patient {
         return area;
     }
 
-    public ArrayList getTemperature() {
-        return temperature;
-    }
+
 
     public int getID() {
         return ID;
@@ -72,9 +69,6 @@ public class patient {
         this.normal_temperature_num = normal_temperature_num;
     }
 
-    public void setTemperature(ArrayList temperature) {
-        this.temperature = temperature;
-    }
 
     public void setNormal_test_num(int normal_test_num) {
         this.normal_test_num = normal_test_num;
@@ -92,28 +86,17 @@ public class patient {
         this.state = state;
     }
 
-    public patient(int ID, String name, int level, int area, int bed_ID, String temperature,
-                   int normal_temperature_num, int normal_test_num, int nurse_ID, int state){
-        this.ID= ID;
-        this.name= name;
-        this.level= level;
-        this.area= area;
-        this.bed_ID= bed_ID;
-        this.state=state;
-        this.normal_temperature_num= normal_temperature_num;
-        this.normal_test_num= normal_test_num;
-        this.nurse_ID= nurse_ID;
-
-        ArrayList<String> temperature_list=new ArrayList<>();
-        if (temperature!=null){
-            String[] splitTemperature=temperature.split(",");
-            for (int i=0;i<splitTemperature.length;i++){
-                temperature_list.add(splitTemperature[i]);
-            }
-        }else {
-            temperature_list=null;
-        }
-        this.temperature=temperature_list;
+    public patient(int ID, String name, int level, int area, int bed_ID,
+                   int normal_temperature_num, int normal_test_num, int nurse_ID, int state) {
+        this.ID = ID;
+        this.name = name;
+        this.level = level;
+        this.area = area;
+        this.bed_ID = bed_ID;
+        this.state = state;
+        this.normal_temperature_num = normal_temperature_num;
+        this.normal_test_num = normal_test_num;
+        this.nurse_ID = nurse_ID;
     }
     public patient(){}
 

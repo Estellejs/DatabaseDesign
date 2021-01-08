@@ -1,5 +1,6 @@
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -722,49 +723,7 @@ public class Application {
                         select_tools.print_patients(patients);
                         break;
                     case "update":
-                        System.out.println("请输入病人ID：");
-                        patient patient = new patient();
-                        while (true) {
-                            try {
-                                int patient_id = Integer.parseInt(scanner.next());
-                                condition = "where ID=" + patient_id + " and nurse_ID=" + ward_nurse_id;
-                                patients = select_tools.get_patient_information(condition);
-                                if (patients.size() > 0) {
-                                    patient = patients.get(0);
-                                    break;
-                                } else {
-                                    System.out.println("ID不存在或不是您的病人，请重新输入");
-                                }
-                            } catch (NumberFormatException e) {
-                                System.out.println("输入错误，请重新输入");
-                            }
-                        }
-                        System.out.println("请输入病人今天的体温：(例如：37.3)");
-                        String temperature = scanner.next();
-                        ArrayList<String> patient_temperature = patient.getTemperature();
-                        while (true) {
-                            if (temperature.length() == 4) {
-                                if (Character.isDigit(temperature.charAt(0)) && Character.isDigit(temperature.charAt(1)) && Character.isDigit(temperature.charAt(3)) && temperature.charAt(2) == '.') {
-                                    patient_temperature.add(temperature);
-                                    patient.setTemperature(patient_temperature);
-                                    break;
-                                } else {
-                                    System.out.println("输入错误，请重新输入。");
-                                    temperature = scanner.next();
-                                }
-                            } else {
-                                System.out.println("输入错误，请重新输入。");
-                                temperature = scanner.next();
-                            }
-                        }
-                        int normal_temperature_num = patient.getNormal_temperature_num();
-                        if (temperature.compareTo("37.3") < 0) {
-                            normal_temperature_num += 1;
-                        } else {
-                            normal_temperature_num = 0;
-                        }
-                        patient.setNormal_temperature_num(normal_temperature_num);
-                        update_tools.update_temperature(patient);
+                        update_tools.update_record(ward_nurse_id);
                         break;
                     case "change":
                         update_tools.update_personal_information(table_name, ward_nurse_id);

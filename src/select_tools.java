@@ -43,12 +43,11 @@ public class select_tools {
                 int level=rs.getInt("level");
                 int area=rs.getInt("area");
                 int bed_ID=rs.getInt("bed_ID");
-                String temperature=rs.getString("temperature");
                 int normal_temperature_num=rs.getInt("normal_temperature_num");
                 int normal_test_num=rs.getInt("normal_test_num");
                 int nurse_ID=rs.getInt("nurse_ID");
                 int state=rs.getInt("state");
-                patient patient=new patient( ID,  name,  level,  area,  bed_ID,  temperature,
+                patient patient=new patient( ID,  name,  level,  area,  bed_ID,
                  normal_temperature_num, normal_test_num,  nurse_ID,state);
                 patient_list.add(patient);
             }
@@ -112,10 +111,57 @@ public class select_tools {
                         result += tests.get(j).getDate() +" "+ tests.get(j).getResult() + ";";
                     }
                 }
-                System.out.println("ID:"+patient.getID()+" 姓名："+patient.getName()+"  病情评级："+level+"  区域："+strArea+"  温度："+patient.getTemperature()+"  生命状态："+state+"  核酸检测结果:"+result);
+                ArrayList<record> records=getRecord(patient.getID());
+
+                System.out.println("ID:"+patient.getID()+" 姓名："+patient.getName()+"  病情评级："+level+"  区域："+strArea+"  生命状态："+state+"  核酸检测结果:"+result);
+                System.out.println("  每日记录："+records.size()+"条");
+                for (int j=0;j<records.size();j++){
+                    record record=records.get(j);
+                    state="";
+                    switch (record.getState()){
+                        case 1:
+                            state="康复出院";
+                            break;
+                        case 0:
+                            state="在院治疗";
+                            break;
+                        case -1:
+                            state="病亡";
+                            break;
+                    }
+                    System.out.println("    生命状态："+state+"；温度："+record.getTemperature()+"；症状："+record.getSymptom()+"；核酸检测结果："+record.getTest_result()+"；时间："+record.getDate());
+                }
             }
         }
     }
+    public static ArrayList<record> getRecord(int patient_ID){
+        ArrayList<record> records=new ArrayList<>();
+        Connection connection = null;
+        ResultSet rs = null;
+        PreparedStatement ps=null;
+        String SQL="select * from record where patient_ID="+patient_ID;
+        try {
+            connection = JDBCTool.getMySQLConn();
+            ps = connection.prepareStatement(SQL);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                int ID=rs.getInt("ID");
+                int state =rs.getInt("state");
+                String test_result=rs.getString("test_result");
+                float temperature=rs.getFloat("temperature");
+                String symptom=rs.getString("symptom");
+                Date date=rs.getDate("date");
+                record record=new record(ID,patient_ID, state, test_result, temperature, symptom, date);
+                records.add(record);
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            System.out.println(e.toString());
+        }
+        JDBCTool.releaseDB(rs,ps,connection);
+        return records;
+    }
+
     public static ArrayList<test> getTest(int patientID){
         ArrayList<test> tests=new ArrayList<>();
         Connection connection = null;
