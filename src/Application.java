@@ -259,7 +259,9 @@ public class Application {
                                             }
                                             condition = "where nurse_ID=" + ward_nurse_id + " and area=" + area;
                                             patients = select_tools.get_patient_information(condition);
-                                            if (patients.size() > 0) {
+                                            condition = "where area=" + doctor.getArea()+" and ID="+ward_nurse_id;
+                                            ArrayList<ward_nurse> temp_ward_nurses = select_tools.get_ward_nurse(condition);
+                                            if (temp_ward_nurses.size() > 0) {
                                                 select_tools.print_patients(patients);
                                                 break;
                                             } else {
@@ -391,7 +393,9 @@ public class Application {
                                             is_input_true = false;
                                             condition = "where nurse_ID=" + ward_nurse_id+" and area="+chief_nurse.getArea();
                                             patients = select_tools.get_patient_information(condition);
-                                            if(patients.size()>0)
+                                            condition = "where area=" + chief_nurse.getArea()+" and ID="+ward_nurse_id;
+                                            ArrayList<ward_nurse> temp_ward_nurses = select_tools.get_ward_nurse(condition);
+                                            if(temp_ward_nurses.size()>0)
                                                 select_tools.print_patients(patients);
                                             else{
                                                 is_input_true = true;
